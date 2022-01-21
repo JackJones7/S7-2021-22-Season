@@ -96,6 +96,10 @@ public class S7TeleOp extends OpMode {
             basics.powerMotors(-1 * wheelFactor, 1 * wheelFactor, 1 * wheelFactor, -1 * wheelFactor);
         } else if (gamepad1.dpad_right) {
             basics.powerMotors(1 * wheelFactor, -1 * wheelFactor, -1 * wheelFactor, 1 * wheelFactor);
+        } else if (gamepad1.dpad_up) {
+            basics.powerMotors(-1 * wheelFactor);
+        } else if (gamepad1.dpad_down) {
+            basics.powerMotors(1 * wheelFactor);
         } else {
             basics.powerMotors(gamepad1.right_stick_y * wheelFactor, gamepad1.left_stick_y * wheelFactor);
         }
