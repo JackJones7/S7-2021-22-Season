@@ -121,7 +121,7 @@ public class CarosuelSideAutonomus extends OpMode{
             0, //dz
             AxesOrder.XYZ, //Axes Order
             90, //First Angle
-            90, //Second Anlge
+            90, //Second Angle
             0, //Third Angle
             true //Use competition feild target locations
         );
@@ -188,19 +188,19 @@ public class CarosuelSideAutonomus extends OpMode{
             phase6();
         } else if (phase == 7) {
             //Back up to carousel
-            //phase7();
+            phase7();
         } else if (phase == 8) {
             //Spin Carousel
-            //phase8();
+            phase8();
         } else if (phase == 9) {
             //Strafe straigt to storage unit
-            //phase9();
+            phase9();
         } else if (phase == 10) {
             //Adjust to be completely in storage unit
             //phase10();
         }
         telemetry.addData("phase", phase);
-        telemetry.addData("dist to move", distToMove);
+        telemetry.addData("ticks to move", ticksToMove);
         telemetry.update();
     }
     
@@ -424,6 +424,77 @@ public class CarosuelSideAutonomus extends OpMode{
             front_left.getCurrentPosition() <= ticks &&
             back_right.getCurrentPosition() <= ticks &&
             back_left.getCurrentPosition() >= -ticks && !blueTeam) {
+                basics.powerMotors(0);
+                resetEncoders();
+                endPhase();
+            }
+        }
+    }
+
+    public void phase7() {
+        if (firstLoop) {
+            distToMove = 11 - distBack.getDistance(DistanceUnit.INCH);
+            ticksToMove = basics.inchToTick(distToMove, 480, 12.12);
+            activateMotors();
+            basics.powerMotors(-0.5);
+            firstLoop = false;
+        } else {
+            if (front_right.getCurrentPosition() <= ticksToMove ||
+                    front_left.getCurrentPosition() <= ticksToMove ||
+                    back_right.getCurrentPosition() <= ticksToMove ||
+                    back_left.getCurrentPosition() <= ticksToMove) {
+                basics.powerMotors(0);
+                resetEncoders();
+                endPhase();
+            }
+        }
+    }
+
+    public void phase8() {
+        if (firstLoop) {
+            if (blueTeam) {
+                carouselMotor.setPower(1);
+            } else {
+                carouselMotor.setPower(-1);
+            }
+            startTime = runtime.time(TimeUnit.SECONDS);
+            firstLoop = false;
+        } else {
+            endTime = runtime.time(TimeUnit.SECONDS);
+            if (endTime - startTime >= 5) {
+                carouselMotor.setPower(0);
+                endPhase();
+            }
+        }
+    }
+
+    public void phase9() {
+        if (firstLoop) {
+
+            if (blueTeam) {
+                basics.powerMotors(-0.5, 0.5, 0.5, -0.5);
+            } else {
+                basics.powerMotors(0.5, -0.5, -0.5, 0.5);
+            }
+
+            activateMotors();
+
+            firstLoop = false;
+        } else {
+
+            int ticks = basics.inchToTick(26.0, 480, 12.12);
+
+            if (front_right.getCurrentPosition() <= -ticks &&
+                    front_left.getCurrentPosition() >= ticks &&
+                    back_right.getCurrentPosition() >= ticks &&
+                    back_left.getCurrentPosition() <= -ticks && blueTeam) {
+                basics.powerMotors(0);
+                resetEncoders();
+                endPhase();
+            } else if (front_right.getCurrentPosition() >= ticks &&
+                    front_left.getCurrentPosition() <= -ticks &&
+                    back_right.getCurrentPosition() <= -ticks &&
+                    back_left.getCurrentPosition() >= ticks && !blueTeam) {
                 basics.powerMotors(0);
                 resetEncoders();
                 endPhase();

@@ -78,6 +78,7 @@ public class OMBTest extends OpMode {
         basics = new OpModeBasics(front_right, front_left, back_right, back_left, imu);
         
         telemetry.addData("OMB", "ready");
+        telemetry.addData("Hello", "Good job using Android Studio");
         
         telemetry.update();
         setupComplete = true;
