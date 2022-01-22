@@ -33,7 +33,7 @@ public class OpModeBasics {
     //Variables for actions
     private int actionId;
     private double actionVal;
-    //soon to be obsolete hopfully, hence this fancy new sub class:
+    //soon to be obsolete hopefully, hence this fancy new sub class:
     private action currentAction;
     
     //This might be useful
@@ -47,6 +47,12 @@ public class OpModeBasics {
     private DcMotor fl;
     private DcMotor br;
     private DcMotor bl;
+
+    //Variables for encoder directions
+    public EncoderDirection frEncoderDir = EncoderDirection.FORWARD;
+    public EncoderDirection flEncoderDir = EncoderDirection.FORWARD;
+    public EncoderDirection brEncoderDir = EncoderDirection.FORWARD;
+    public EncoderDirection blEncoderDir = EncoderDirection.FORWARD;
     
     //Define imu variable
     private BNO055IMU imu;
@@ -81,6 +87,12 @@ public class OpModeBasics {
         //Only has motors
         hasMotors = true;
         hasImu = false;
+    }
+
+    //Encoder Direction Enum
+    public enum EncoderDirection {
+        FORWARD,
+        REVERSE
     }
     
 // -Basic power motors commands-
@@ -230,6 +242,48 @@ public class OpModeBasics {
         
         public void execute() {}
         public boolean loop() {return true;}
+    }
+
+
+    public class MoveRobotEncoder {
+
+        private double dist;
+        private int tpr;
+        private double circumference;
+
+        private double frPower;
+        private double flPower;
+        private double brPower;
+        private double blPower;
+
+        private int ticks;
+
+        private int frTgt;
+        private int flTgt;
+        private int brTgt;
+        private int blTgt;
+
+
+        //constructors (all have dist, tpr, circumference)
+        //Move all simultaneously
+
+        //Move both sides independently
+
+        //Move all independently
+
+
+        //execute function
+        //calculate dist -> ticks
+        //set motor target positions depending on motor power and encoder direction
+        //power motors
+        //(if motors are in run to position mode, set motor positions to targets)
+
+        //loop function
+        //if motors are in run to position mode, check if busy
+        //if not busy, power motors off and return true
+        //if motors are in other mode, check if they're past their target
+        //if past target, power motors off and return true
+        //otherwise, return false
     }
     
     
