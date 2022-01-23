@@ -33,7 +33,7 @@ public class OpModeBasics {
     //Variables for actions
     private int actionId;
     private double actionVal;
-    //soon to be obsolete hopfully, hence this fancy new sub class:
+    //soon to be obsolete hopefully, hence this fancy new sub class:
     private action currentAction;
     
     //This might be useful
@@ -222,8 +222,54 @@ public class OpModeBasics {
 // ------------------------
 
 
+    //Wheel group
+    public class WheelGroup {
+        private DcMotor fr;
+        private DcMotor fl;
+        private DcMotor br;
+        private DcMotor bl;
 
-    
+        public boolean frEncoderReverse;
+        public boolean flEncoderReverse;
+        public boolean brEncoderReverse;
+        public boolean blEncoderReverse;
+
+        //Constructor: sets up all motors
+        public WheelGroup(DcMotor fr, DcMotor fl, DcMotor br, DcMotor bl) {
+            this.fr = fr;
+            this.fl = fl;
+            this.br = br;
+            this.bl = bl;
+        }
+
+        //Power 4 motors
+        public void powerMotors(double power) {
+            fr.setPower(power);
+            fl.setPower(power);
+            br.setPower(power);
+            bl.setPower(power);
+        }
+
+        //Power 2 sides
+        public void powerMotors(double pr, double pl) {
+            fr.setPower(pr);
+            br.setPower(pr);
+            fl.setPower(pl);
+            bl.setPower(pl);
+        }
+
+        //Power all independently
+        public void powerMotors(double frPower, double flPower, double brPower, double blPower) {
+            fr.setPower(frPower);
+            fl.setPower(flPower);
+            br.setPower(brPower);
+            bl.setPower(blPower);
+        }
+
+    }
+
+
+    //Actions \/\/\/\/\/\/\/
     //action class
     private class action {
         private boolean done;
@@ -382,5 +428,15 @@ public class OpModeBasics {
             return false;
         }
     }
-    
+
+
+
+    //Enums \/\/\/\/\/\/\/
+    public enum Wheel {
+        FR,
+        FL,
+        BR,
+        BL
+    }
+
 }
