@@ -43,14 +43,16 @@ public class OMBTest extends OpMode {
         back_right = hardwareMap.dcMotor.get("back_right");
         back_left = hardwareMap.dcMotor.get("back_left");
         
-        front_right.setDirection(DcMotorSimple.Direction.REVERSE);
-        back_right.setDirection(DcMotorSimple.Direction.REVERSE);
+        front_left.setDirection(DcMotorSimple.Direction.REVERSE);
+        back_left.setDirection(DcMotorSimple.Direction.REVERSE);
 
         basics = new OpModeBasics(front_right, front_left, back_right, back_left);
         wheels = basics.createWheelGroup(front_right, front_left, back_right, back_left);
 
         wheels.setTargetPositions(0);
         wheels.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheels.frEncoderReverse = true;
+        wheels.flEncoderReverse = true;
         
         //BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         
