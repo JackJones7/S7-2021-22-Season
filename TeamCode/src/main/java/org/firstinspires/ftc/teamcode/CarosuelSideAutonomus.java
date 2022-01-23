@@ -24,6 +24,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TfodCurrentGame;
 
 import org.firstinspires.ftc.teamcode.lib.OpModeBasics;
+import org.firstinspires.ftc.teamcode.lib.OpModeBasics.WheelGroup;
 
 @Autonomous
 
@@ -50,6 +51,8 @@ public class CarosuelSideAutonomus extends OpMode{
     protected Recognition duck;
     
     protected OpModeBasics basics;
+    protected WheelGroup wheels;
+
     protected boolean blueTeam = true;
     protected int phase = 1;
     protected boolean firstLoop = true;
@@ -137,6 +140,9 @@ public class CarosuelSideAutonomus extends OpMode{
         tfodFreightFrenzy.setZoom(1, 16 / 9);
         
         basics = new OpModeBasics(front_right, front_left, back_right, back_left);
+        wheels = basics.createWheelGroup(front_right, front_left, back_right, back_left);
+        wheels.frEncoderReverse = true;
+        wheels.flEncoderReverse = true;
     }
     
     //start function
@@ -286,7 +292,7 @@ public class CarosuelSideAutonomus extends OpMode{
             firstLoop = false;
         } else {
             
-            int ticks = basics.inchToTick(32.0, 480, 12.12);
+            int ticks = basics.inchToTick(40.0, 480, 12.12);
             
             if (front_right.getCurrentPosition() <= -ticks &&
             front_left.getCurrentPosition() >= ticks &&
@@ -411,7 +417,7 @@ public class CarosuelSideAutonomus extends OpMode{
             
             firstLoop = false;
         } else {
-            int ticks = basics.inchToTick(31.0, 480, 12.12);
+            int ticks = basics.inchToTick(40.0, 480, 12.12);
             
             if (front_right.getCurrentPosition() >= ticks &&
             front_left.getCurrentPosition() <= -ticks &&
@@ -420,10 +426,10 @@ public class CarosuelSideAutonomus extends OpMode{
                 basics.powerMotors(0);
                 resetEncoders();
                 endPhase();
-            } else if (front_right.getCurrentPosition() >= -ticks &&
-            front_left.getCurrentPosition() <= ticks &&
-            back_right.getCurrentPosition() <= ticks &&
-            back_left.getCurrentPosition() >= -ticks && !blueTeam) {
+            } else if (front_right.getCurrentPosition() <= -ticks &&
+            front_left.getCurrentPosition() >= ticks &&
+            back_right.getCurrentPosition() >= ticks &&
+            back_left.getCurrentPosition() <= -ticks && !blueTeam) {
                 basics.powerMotors(0);
                 resetEncoders();
                 endPhase();
