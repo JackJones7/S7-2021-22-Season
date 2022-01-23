@@ -50,6 +50,7 @@ public class OMBTest extends OpMode {
         wheels = basics.createWheelGroup(front_right, front_left, back_right, back_left);
 
         wheels.setTargetPositions(0);
+        wheels.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         
         //BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         
@@ -77,7 +78,7 @@ public class OMBTest extends OpMode {
         
         if (gamepad1.a) {
             wheels.setTargetPositions(480);
-            wheels.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            wheels.setModes(DcMotor.RunMode.RUN_TO_POSITION);
             telemetry.addData("encoder", "yes");
         } else if (gamepad1.b) {
             wheels.setTargetPositions(0);
