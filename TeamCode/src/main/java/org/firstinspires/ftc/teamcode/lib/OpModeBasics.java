@@ -243,7 +243,7 @@ public class OpModeBasics {
         }
 
         //Power 4 motors
-        public void powerMotors(double power) {
+        public void powerWheels(double power) {
             fr.setPower(power);
             fl.setPower(power);
             br.setPower(power);
@@ -251,7 +251,7 @@ public class OpModeBasics {
         }
 
         //Power 2 sides
-        public void powerMotors(double pr, double pl) {
+        public void powerWheels(double pr, double pl) {
             fr.setPower(pr);
             br.setPower(pr);
             fl.setPower(pl);
@@ -259,11 +259,36 @@ public class OpModeBasics {
         }
 
         //Power all independently
-        public void powerMotors(double frPower, double flPower, double brPower, double blPower) {
+        public void powerWheels(double frPower, double flPower, double brPower, double blPower) {
             fr.setPower(frPower);
             fl.setPower(flPower);
             br.setPower(brPower);
             bl.setPower(blPower);
+        }
+
+
+        //Set 4 positions
+        public void setTargetPositions(int position) {
+            fr.setTargetPosition(position);
+            fl.setTargetPosition(position);
+            br.setTargetPosition(position);
+            bl.setTargetPosition(position);
+        }
+
+        //Set side positions
+        public void setTargetPositions(int pr, int pl) {
+            fr.setTargetPosition(pr);
+            fl.setTargetPosition(pl);
+            br.setTargetPosition(pr);
+            bl.setTargetPosition(pl);
+        }
+
+        //Set all positions independently
+        public void setTargetPositions(int frTgt, int flTgt, int brTgt, int blTgt) {
+            fr.setTargetPosition(frTgt);
+            fl.setTargetPosition(flTgt);
+            br.setTargetPosition(brTgt);
+            bl.setTargetPosition(blTgt);
         }
 
     }
