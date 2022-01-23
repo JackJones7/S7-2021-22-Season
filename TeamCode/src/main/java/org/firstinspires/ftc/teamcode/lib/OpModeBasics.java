@@ -33,7 +33,7 @@ public class OpModeBasics {
     //Variables for actions
     private int actionId;
     private double actionVal;
-    //soon to be obsolete hopfully, hence this fancy new sub class:
+    //soon to be obsolete hopefully, hence this fancy new sub class:
     private action currentAction;
     
     //This might be useful
@@ -222,8 +222,158 @@ public class OpModeBasics {
 // ------------------------
 
 
+    //Wheel group
+    public class WheelGroup {
+        private DcMotor fr;
+        private DcMotor fl;
+        private DcMotor br;
+        private DcMotor bl;
 
-    
+        public boolean frEncoderReverse;
+        public boolean flEncoderReverse;
+        public boolean brEncoderReverse;
+        public boolean blEncoderReverse;
+
+        //Constructor: sets up all motors
+        public WheelGroup(DcMotor fr, DcMotor fl, DcMotor br, DcMotor bl) {
+            this.fr = fr;
+            this.fl = fl;
+            this.br = br;
+            this.bl = bl;
+        }
+
+        //Power 4 motors
+        public void setPower(double power) {
+            fr.setPower(power);
+            fl.setPower(power);
+            br.setPower(power);
+            bl.setPower(power);
+        }
+
+        //Power 2 sides
+        public void setPower(double pr, double pl) {
+            fr.setPower(pr);
+            br.setPower(pr);
+            fl.setPower(pl);
+            bl.setPower(pl);
+        }
+
+        //Power all independently
+        public void setPower(double frPower, double flPower, double brPower, double blPower) {
+            fr.setPower(frPower);
+            fl.setPower(flPower);
+            br.setPower(brPower);
+            bl.setPower(blPower);
+        }
+
+
+        //Set 4 positions
+        public void setTargetPositions(int position) {
+            WheelInts dirs = getIntEncoderDirections();
+            fr.setTargetPosition(position * dirs.fr);
+            fl.setTargetPosition(position * dirs.fl);
+            br.setTargetPosition(position * dirs.br);
+            bl.setTargetPosition(position * dirs.bl);
+        }
+
+        //Set side positions
+        public void setTargetPositions(int pr, int pl) {
+            WheelInts dirs = getIntEncoderDirections();
+            fr.setTargetPosition(pr * dirs.fr);
+            fl.setTargetPosition(pl * dirs.fl);
+            br.setTargetPosition(pr * dirs.br);
+            bl.setTargetPosition(pl * dirs.bl);
+        }
+
+        //Set all positions independently
+        public void setTargetPositions(int frTgt, int flTgt, int brTgt, int blTgt) {
+            WheelInts dirs = getIntEncoderDirections();
+            fr.setTargetPosition(frTgt * dirs.fr);
+            fl.setTargetPosition(flTgt * dirs.fl);
+            br.setTargetPosition(brTgt * dirs.br);
+            bl.setTargetPosition(blTgt * dirs.bl);
+        }
+
+
+        //change mode for all motors
+        public void setModes(DcMotor.RunMode mode) {
+            fr.setMode(mode);
+            fl.setMode(mode);
+            br.setMode(mode);
+            bl.setMode(mode);
+        }
+
+
+        //return motor powers
+        public WheelDoubles getPowers() {
+            return new WheelDoubles(fr.getPower(), fl.getPower(), br.getPower(), bl.getPower());
+        }
+
+        //return motor target positions
+        public WheelInts getTargetPositions() {
+            return new WheelInts(fr.getTargetPosition(), fl.getTargetPosition(), br.getTargetPosition(), bl.getTargetPosition());
+        }
+
+        //return motor positions
+        public WheelInts getCurrentPositions() {
+            return new WheelInts(fr.getCurrentPosition(), fl.getCurrentPosition(), br.getCurrentPosition(), bl.getCurrentPosition());
+        }
+
+
+        public WheelInts getIntEncoderDirections() {
+            int frDir;
+            int flDir;
+            int brDir;
+            int blDir;
+
+            if (frEncoderReverse) {frDir = -1;} else {frDir = 1;}
+            if (flEncoderReverse) {flDir = -1;} else {flDir = 1;}
+            if (brEncoderReverse) {brDir = -1;} else {brDir = 1;}
+            if (blEncoderReverse) {blDir = -1;} else {blDir = 1;}
+
+            return new WheelInts(frDir, flDir, brDir, blDir);
+
+        }
+
+
+        //Subclasses
+        public class WheelDoubles {
+            public double fr;
+            public double fl;
+            public double br;
+            public double bl;
+
+            public WheelDoubles (double fr, double fl, double br, double bl) {
+                this.fr = fr;
+                this.fl = fl;
+                this.br = br;
+                this.bl = bl;
+            }
+        }
+
+        public class WheelInts {
+            public int fr;
+            public int fl;
+            public int br;
+            public int bl;
+
+            public WheelInts (int fr, int fl, int br, int bl) {
+                this.fr = fr;
+                this.fl = fl;
+                this.br = br;
+                this.bl = bl;
+            }
+        }
+
+    }
+
+    //Create and return Wheel Group
+    public WheelGroup createWheelGroup(DcMotor fr, DcMotor fl, DcMotor br, DcMotor bl) {
+        return new WheelGroup(fr, fl, br, bl);
+    }
+
+
+    //Actions \/\/\/\/\/\/\/
     //action class
     private class action {
         private boolean done;
@@ -382,5 +532,15 @@ public class OpModeBasics {
             return false;
         }
     }
-    
+
+
+
+    //Enums \/\/\/\/\/\/\/
+    public enum Wheel {
+        FR,
+        FL,
+        BR,
+        BL
+    }
+
 }
