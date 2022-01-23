@@ -269,26 +269,100 @@ public class OpModeBasics {
 
         //Set 4 positions
         public void setTargetPositions(int position) {
-            fr.setTargetPosition(position);
-            fl.setTargetPosition(position);
-            br.setTargetPosition(position);
-            bl.setTargetPosition(position);
+            WheelInts dirs = getIntEncoderDirections();
+            fr.setTargetPosition(position * dirs.fr);
+            fl.setTargetPosition(position * dirs.fl);
+            br.setTargetPosition(position * dirs.br);
+            bl.setTargetPosition(position * dirs.bl);
         }
 
         //Set side positions
         public void setTargetPositions(int pr, int pl) {
-            fr.setTargetPosition(pr);
-            fl.setTargetPosition(pl);
-            br.setTargetPosition(pr);
-            bl.setTargetPosition(pl);
+            WheelInts dirs = getIntEncoderDirections();
+            fr.setTargetPosition(pr * dirs.fr);
+            fl.setTargetPosition(pl * dirs.fl);
+            br.setTargetPosition(pr * dirs.br);
+            bl.setTargetPosition(pl * dirs.bl);
         }
 
         //Set all positions independently
         public void setTargetPositions(int frTgt, int flTgt, int brTgt, int blTgt) {
-            fr.setTargetPosition(frTgt);
-            fl.setTargetPosition(flTgt);
-            br.setTargetPosition(brTgt);
-            bl.setTargetPosition(blTgt);
+            WheelInts dirs = getIntEncoderDirections();
+            fr.setTargetPosition(frTgt * dirs.fr);
+            fl.setTargetPosition(flTgt * dirs.fl);
+            br.setTargetPosition(brTgt * dirs.br);
+            bl.setTargetPosition(blTgt * dirs.bl);
+        }
+
+
+        //change mode for all motors
+        public void setModes(DcMotor.RunMode mode) {
+            fr.setMode(mode);
+            fl.setMode(mode);
+            br.setMode(mode);
+            bl.setMode(mode);
+        }
+
+
+        //return motor powers
+        public WheelDoubles getWheelPowers() {
+            return new WheelDoubles(fr.getPower(), fl.getPower(), br.getPower(), bl.getPower());
+        }
+
+        //return motor target positions
+        public WheelInts getWheelTargetPositions() {
+            return new WheelInts(fr.getTargetPosition(), fl.getTargetPosition(), br.getTargetPosition(), bl.getTargetPosition());
+        }
+
+        //return motor positions
+        public WheelInts getWheelCurrentPositions() {
+            return new WheelInts(fr.getCurrentPosition(), fl.getCurrentPosition(), br.getCurrentPosition(), bl.getCurrentPosition());
+        }
+
+
+        public WheelInts getIntEncoderDirections() {
+            int frDir;
+            int flDir;
+            int brDir;
+            int blDir;
+
+            if (frEncoderReverse) {frDir = -1;} else {frDir = 1;}
+            if (flEncoderReverse) {flDir = -1;} else {flDir = 1;}
+            if (brEncoderReverse) {brDir = -1;} else {brDir = 1;}
+            if (blEncoderReverse) {blDir = -1;} else {blDir = 1;}
+
+            return new WheelInts(frDir, flDir, brDir, blDir);
+
+        }
+
+
+        //Subclasses
+        private class WheelDoubles {
+            public double fr;
+            public double fl;
+            public double br;
+            public double bl;
+
+            public WheelDoubles (double fr, double fl, double br, double bl) {
+                this.fr = fr;
+                this.fl = fl;
+                this.br = br;
+                this.bl = bl;
+            }
+        }
+
+        private class WheelInts {
+            public int fr;
+            public int fl;
+            public int br;
+            public int bl;
+
+            public WheelInts (int fr, int fl, int br, int bl) {
+                this.fr = fr;
+                this.fl = fl;
+                this.br = br;
+                this.bl = bl;
+            }
         }
 
     }
