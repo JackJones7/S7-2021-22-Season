@@ -243,7 +243,7 @@ public class OpModeBasics {
         }
 
         //Power 4 motors
-        public void powerWheels(double power) {
+        public void setPower(double power) {
             fr.setPower(power);
             fl.setPower(power);
             br.setPower(power);
@@ -251,7 +251,7 @@ public class OpModeBasics {
         }
 
         //Power 2 sides
-        public void powerWheels(double pr, double pl) {
+        public void setPower(double pr, double pl) {
             fr.setPower(pr);
             br.setPower(pr);
             fl.setPower(pl);
@@ -259,7 +259,7 @@ public class OpModeBasics {
         }
 
         //Power all independently
-        public void powerWheels(double frPower, double flPower, double brPower, double blPower) {
+        public void setPower(double frPower, double flPower, double brPower, double blPower) {
             fr.setPower(frPower);
             fl.setPower(flPower);
             br.setPower(brPower);
@@ -305,17 +305,17 @@ public class OpModeBasics {
 
 
         //return motor powers
-        public WheelDoubles getWheelPowers() {
+        public WheelDoubles getPowers() {
             return new WheelDoubles(fr.getPower(), fl.getPower(), br.getPower(), bl.getPower());
         }
 
         //return motor target positions
-        public WheelInts getWheelTargetPositions() {
+        public WheelInts getTargetPositions() {
             return new WheelInts(fr.getTargetPosition(), fl.getTargetPosition(), br.getTargetPosition(), bl.getTargetPosition());
         }
 
         //return motor positions
-        public WheelInts getWheelCurrentPositions() {
+        public WheelInts getCurrentPositions() {
             return new WheelInts(fr.getCurrentPosition(), fl.getCurrentPosition(), br.getCurrentPosition(), bl.getCurrentPosition());
         }
 
@@ -337,7 +337,7 @@ public class OpModeBasics {
 
 
         //Subclasses
-        private class WheelDoubles {
+        public class WheelDoubles {
             public double fr;
             public double fl;
             public double br;
@@ -351,7 +351,7 @@ public class OpModeBasics {
             }
         }
 
-        private class WheelInts {
+        public class WheelInts {
             public int fr;
             public int fl;
             public int br;
@@ -365,6 +365,11 @@ public class OpModeBasics {
             }
         }
 
+    }
+
+    //Create and return Wheel Group
+    public WheelGroup createWheelGroup(DcMotor fr, DcMotor fl, DcMotor br, DcMotor bl) {
+        return new WheelGroup(fr, fl, br, bl);
     }
 
 
