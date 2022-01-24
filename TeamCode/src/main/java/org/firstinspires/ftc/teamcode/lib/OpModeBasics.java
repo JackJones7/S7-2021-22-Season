@@ -236,10 +236,10 @@ public class OpModeBasics {
 
     //Wheel group
     public class WheelGroup {
-        private DcMotor fr;
-        private DcMotor fl;
-        private DcMotor br;
-        private DcMotor bl;
+        public DcMotor fr;
+        public DcMotor fl;
+        public DcMotor br;
+        public DcMotor bl;
 
         public boolean frEncoderReverse;
         public boolean flEncoderReverse;
@@ -397,6 +397,8 @@ public class OpModeBasics {
 
     public class MoveRobotEncoder {
 
+        private WheelGroup wheels;
+
         private double dist;
         private int tpr;
         private double circumference;
@@ -408,32 +410,98 @@ public class OpModeBasics {
 
         private int ticks;
 
-        private int frTgt;
-        private int flTgt;
-        private int brTgt;
-        private int blTgt;
+        private int target;
 
-
-        //constructors (all have dist, tpr, circumference)
+        //constructors (all have wheel group, dist, tpr, circumference)
         //Move all simultaneously
+        public MoveRobotEncoder(WheelGroup wheels, double power, double dist,
+                                int tpr, double circumference) {
+            this.wheels = wheels;
+
+            this.frPower = power;
+            this.flPower = power;
+            this.brPower = power;
+            this.blPower = power;
+
+            this.dist = dist;
+            this.tpr = tpr;
+            this.circumference = circumference;
+        }
 
         //Move both sides independently
+        public MoveRobotEncoder(WheelGroup wheels, double pr, double pl, double dist,
+                                int tpr, double circumference) {
+            this.wheels = wheels;
+
+            this.frPower = pr;
+            this.flPower = pl;
+            this.brPower = pr;
+            this.blPower = pl;
+
+            this.dist = dist;
+            this.tpr = tpr;
+            this.circumference = circumference;
+        }
 
         //Move all independently
+        public MoveRobotEncoder(WheelGroup wheels, double fr, double fl, double br,
+                                double bl, double dist, int tpr, double circumference) {
+            this.wheels = wheels;
+
+            this.frPower = fr;
+            this.flPower = fl;
+            this.brPower = br;
+            this.blPower = bl;
+
+            this.dist = dist;
+            this.tpr = tpr;
+            this.circumference = circumference;
+        }
 
 
         //execute function
-        //calculate dist -> ticks
-        //set motor target positions depending on motor power and encoder direction
-        //power motors
-        //(if motors are in run to position mode, set motor positions to targets)
+        public void execute() {
+            //store abs of dist -> ticks
+            target = Math.abs(inchToTick(dist, tpr, circumference));
 
-        //loop function
-        //if motors are in run to position mode, check if busy
-        //if not busy, power motors off and return true
-        //if motors are in other mode, check if they're past their target
-        //if past target, power motors off and return true
-        //otherwise, return false
+            //power motors
+            wheels.setPower(frPower, flPower, brPower, blPower);
+            //(if motors are in run to position mode, set motor positions to targets)
+        }
+
+        public boolean loop() {
+            //loop function
+            if (wheels.fr.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
+
+                //if motors are in run to position mode, check if busy
+                //if not busy, power motors off and return true
+                return true;
+
+            } else if (wheels.fr.getMode() == DcMotor.RunMode.RUN_USING_ENCODER ||
+                       wheels.fr.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
+                //if motors are in other mode, check if abs of current pos >= target pos
+                WheelGroup.WheelInts positions = wheels.getCurrentPositions();
+                if (Math.abs(positions.fr) >= target && Math.abs(positions.fl) >= target &&
+                    Math.abs(positions.br) >= target && Math.abs(positions.bl) >= target) {
+
+                    //if true, power motors off and return true
+                    wheels.setPower(0);
+                    return true;
+
+                } else {
+
+                    //otherwise, return false
+                    return false;
+
+                }
+            } else {
+
+                return true;
+
+            }
+
+        }
+
     }
     
     
