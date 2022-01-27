@@ -1,23 +1,16 @@
 //Motor order: fr, fl, br, bl
 package org.firstinspires.ftc.teamcode.lib;
 
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.Axis;
-import com.qualcomm.robotcore.hardware.Blinker;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Gyroscope;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.Gyroscope;
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 
 public class OpModeBasics {
@@ -34,7 +27,7 @@ public class OpModeBasics {
     private int actionId;
     private double actionVal;
     //soon to be obsolete hopefully, hence this fancy new sub class:
-    private action currentAction;
+    private Action currentAction;
     
     //This might be useful
     
@@ -192,6 +185,12 @@ public class OpModeBasics {
         currentAction.execute();
         
     }
+
+    //Move robot with encoder (wheel group, dist, tpr, circumference)
+    public void moveRobotEncoder(WheelGroup wheels, double power, double dist, int tpr, double circumference) {
+        currentAction = new MoveRobotEncoder(wheels, power, dist, tpr, circumference);
+        currentAction.execute();
+    }
     
     
 //Inches -> ticks converter
@@ -227,7 +226,7 @@ public class OpModeBasics {
         }
         */
         if (currentAction.loop()) {
-            currentAction = new action();
+            currentAction = new Action();
         }
     }
         
@@ -387,7 +386,7 @@ public class OpModeBasics {
 
     //Actions \/\/\/\/\/\/\/
     //action class
-    private class action {
+    private class Action {
         private boolean done;
         
         public void execute() {}
@@ -395,7 +394,7 @@ public class OpModeBasics {
     }
 
 
-    public class MoveRobotEncoder {
+    public class MoveRobotEncoder extends Action {
 
         private WheelGroup wheels;
 
@@ -460,6 +459,7 @@ public class OpModeBasics {
 
 
         //execute function
+        @Override
         public void execute() {
             //store abs of dist -> ticks
             target = Math.abs(inchToTick(dist, tpr, circumference));
@@ -469,6 +469,7 @@ public class OpModeBasics {
             //(if motors are in run to position mode, set motor positions to targets)
         }
 
+        @Override
         public boolean loop() {
             //loop function
             if (wheels.fr.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
@@ -506,7 +507,7 @@ public class OpModeBasics {
     
     
     //action class children
-    public class Turn extends action {
+    public class Turn extends Action {
         
         Orientation globalAngle;
         Orientation lastAngles;
@@ -600,7 +601,7 @@ public class OpModeBasics {
         }
     }
     
-    public class MoveRobot extends action {
+    public class MoveRobot extends Action {
         private double tgtDist;
         private Axis axis;
         private Position startPos;

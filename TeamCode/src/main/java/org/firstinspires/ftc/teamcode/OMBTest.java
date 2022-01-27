@@ -78,15 +78,7 @@ public class OMBTest extends OpMode {
         
         //imu.startAccelerationIntegration(new Position(), new Velocity(), 5);
         
-        if (gamepad1.a) {
-            wheels.setTargetPositions(480);
-            wheels.setModes(DcMotor.RunMode.RUN_TO_POSITION);
-            telemetry.addData("encoder", "yes");
-        } else if (gamepad1.b) {
-            wheels.setTargetPositions(0);
-            wheels.setModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            telemetry.addData("encoder", "no");
-        }
+        wheels.setModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         
         //telemetry.addData("OMB", "ready");
@@ -107,11 +99,13 @@ public class OMBTest extends OpMode {
         
         //telemetry.addData("Imu Y Position", imu.getPosition().y);
 
-        if (wheels.getTargetPositions().fr == 0) {
+        /*if (wheels.getTargetPositions().fr == 0) {
             wheels.setPower(gamepad1.right_stick_y, gamepad1.left_stick_y);
         } else {
             wheels.setPower(0.5);
-        }
+        }*/
+
+        basics.moveRobotEncoder(wheels, 0.4, 6, 480, 12.12);
 
         WheelGroup.WheelInts positions = wheels.getCurrentPositions();
 
