@@ -186,9 +186,22 @@ public class OpModeBasics {
         
     }
 
-    //Move robot with encoder (wheel group, dist, tpr, circumference)
+    //Move robot with encoder (wheel group, power, dist, tpr, circumference)
     public void moveRobotEncoder(WheelGroup wheels, double power, double dist, int tpr, double circumference) {
         currentAction = new MoveRobotEncoder(wheels, power, dist, tpr, circumference);
+        currentAction.execute();
+    }
+
+    //Move robot with encoder (wheel group, right power, left power, dist, tpr, circumference)
+    public void moveRobotEncoder(WheelGroup wheels, double pr, double pl, double dist, int tpr, double circumference) {
+        currentAction = new MoveRobotEncoder(wheels, pr, pl, dist, tpr, circumference);
+        currentAction.execute();
+    }
+
+    //Move robot with encoder (wheel group, fr power, fl power, br power, bl power, dist, tpr, circumference)
+    public void moveRobotEncoder(WheelGroup wheels, double frPower, double flPower,
+                                 double brPower, double blPower, double dist, int tpr, double circumference) {
+        currentAction = new MoveRobotEncoder(wheels, frPower, flPower, brPower, blPower, dist, tpr, circumference);
         currentAction.execute();
     }
     
@@ -202,29 +215,7 @@ public class OpModeBasics {
         
 // -Function for each loop-
     
-    public void basicsUpdate() {
-        //turn towards correctAngle, unless correctAngle > 360
-        
-        /*
-        //If action Id is 1...
-        if (actionId == 1) {
-            //if fr power > 0...
-            if (fl.getPower() > 0) {
-                //if imu angle > action val, stop action
-                if (getAngle() < actionVal) {
-                    powerMotors(0);
-                    actionId = 0;
-                    actionVal = 0;
-                }
-            } else {
-                if (getAngle() > actionVal) {
-                    powerMotors(0);
-                    actionId = 0;
-                    actionVal = 0;
-                }
-            }
-        }
-        */
+    public void update() {
         if (currentAction.loop()) {
             currentAction = new Action();
         }
@@ -384,6 +375,8 @@ public class OpModeBasics {
     }
 
 
+
+
     //Actions \/\/\/\/\/\/\/
     //action class
     private class Action {
@@ -409,7 +402,11 @@ public class OpModeBasics {
 
         private int ticks;
 
-        private int target;
+        private int baseTarget;
+        private int frTgt;
+        private int flTgt;
+        private int brTgt;
+        private int blTgt;
 
         //constructors (all have wheel group, dist, tpr, circumference)
         //Move all simultaneously
@@ -462,7 +459,15 @@ public class OpModeBasics {
         @Override
         public void execute() {
             //store abs of dist -> ticks
-            target = Math.abs(inchToTick(dist, tpr, circumference));
+            baseTarget = Math.abs(inchToTick(dist, tpr, circumference));
+
+            WheelGroup.WheelInts positions = wheels.getCurrentPositions();
+
+            //Set targets for all motors
+            frTgt = baseTarget + Math.abs(positions.fr);
+            flTgt = baseTarget + Math.abs(positions.fl);
+            brTgt = baseTarget + Math.abs(positions.br);
+            blTgt = baseTarget + Math.abs(positions.bl);
 
             //power motors
             wheels.setPower(frPower, flPower, brPower, blPower);
@@ -472,18 +477,18 @@ public class OpModeBasics {
         @Override
         public boolean loop() {
             //loop function
-            if (wheels.fr.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
+            //if (wheels.fr.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
 
                 //if motors are in run to position mode, check if busy
                 //if not busy, power motors off and return true
-                return true;
+           //     return true;
 
-            } else if (wheels.fr.getMode() == DcMotor.RunMode.RUN_USING_ENCODER ||
-                       wheels.fr.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
-                //if motors are in other mode, check if abs of current pos >= target pos
-                WheelGroup.WheelInts positions = wheels.getCurrentPositions();
-                if (Math.abs(positions.fr) >= target && Math.abs(positions.fl) >= target &&
-                    Math.abs(positions.br) >= target && Math.abs(positions.bl) >= target) {
+            //} else if (wheels.fr.getMode() == DcMotor.RunMode.RUN_USING_ENCODER ||
+            //           wheels.fr.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
+            //if motors are in other mode, check if abs of current pos >= target pos
+            WheelGroup.WheelInts positions = wheels.getCurrentPositions();
+            if (Math.abs(positions.fr) >= frTgt && Math.abs(positions.fl) >= flTgt &&
+                Math.abs(positions.br) >= brTgt && Math.abs(positions.bl) >= blTgt) {
 
                     //if true, power motors off and return true
                     wheels.setPower(0);
@@ -495,11 +500,11 @@ public class OpModeBasics {
                     return false;
 
                 }
-            } else {
+           // } else {
 
-                return true;
+           //     return true;
 
-            }
+            //}
 
         }
 

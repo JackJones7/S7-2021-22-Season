@@ -43,16 +43,19 @@ public class OMBTest extends OpMode {
         back_right = hardwareMap.dcMotor.get("back_right");
         back_left = hardwareMap.dcMotor.get("back_left");
         
-        front_left.setDirection(DcMotorSimple.Direction.REVERSE);
-        back_left.setDirection(DcMotorSimple.Direction.REVERSE);
+        front_right.setDirection(DcMotorSimple.Direction.REVERSE);
+        back_right.setDirection(DcMotorSimple.Direction.REVERSE);
 
         basics = new OpModeBasics(front_right, front_left, back_right, back_left);
         wheels = basics.createWheelGroup(front_right, front_left, back_right, back_left);
 
         wheels.setTargetPositions(0);
         wheels.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        wheels.frEncoderReverse = true;
-        wheels.flEncoderReverse = true;
+
+        wheels.fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        wheels.fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        wheels.bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        wheels.br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         
         //BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         
@@ -87,6 +90,11 @@ public class OMBTest extends OpMode {
         telemetry.update();
         setupComplete = true;
     }
+
+    @Override
+    public void start() {
+        //basics.moveRobotEncoder(wheels, 0.4, 6, 480, 12.12);
+    }
     
     @Override
     public void loop() {
@@ -105,14 +113,26 @@ public class OMBTest extends OpMode {
             wheels.setPower(0.5);
         }*/
 
-        basics.moveRobotEncoder(wheels, 0.4, 6, 480, 12.12);
+        if (gamepad1.dpad_down) {
+            basics.moveRobotEncoder(wheels, -0.4, 12, 480, 12.12);
+        } else if (gamepad1.dpad_up) {
+            basics.moveRobotEncoder(wheels, 0.4, 12, 480, 12.12);
+        } else if (gamepad1.dpad_left) {
+            basics.moveRobotEncoder(wheels, 0.4, -0.4, -0.4, 0.4, 12, 480, 12.12);
+        } else if (gamepad1.dpad_right) {
+            basics.moveRobotEncoder(wheels, -0.4, 0.4, 0.4, -0.4, 12, 480, 12.12);
+        }
+
+        telemetry.addData("ticks to victory", Math.abs(basics.inchToTick(6, 480, 12)));
 
         WheelGroup.WheelInts positions = wheels.getCurrentPositions();
 
-        telemetry.addData("fr pos", positions.fr);
-        telemetry.addData("fl pos", positions.fl);
-        telemetry.addData("br pos", positions.br);
-        telemetry.addData("bl pos", positions.bl);
+        telemetry.addData("fr pos", Math.abs(positions.fr));
+        telemetry.addData("fl pos", Math.abs(positions.fl));
+        telemetry.addData("br pos", Math.abs(positions.br));
+        telemetry.addData("bl pos", Math.abs(positions.bl));
+
+        basics.update();
         
         telemetry.update();
     }
