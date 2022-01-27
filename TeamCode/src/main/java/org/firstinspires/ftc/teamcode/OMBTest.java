@@ -43,16 +43,22 @@ public class OMBTest extends OpMode {
         back_right = hardwareMap.dcMotor.get("back_right");
         back_left = hardwareMap.dcMotor.get("back_left");
         
-        front_left.setDirection(DcMotorSimple.Direction.REVERSE);
-        back_left.setDirection(DcMotorSimple.Direction.REVERSE);
+        front_right.setDirection(DcMotorSimple.Direction.REVERSE);
+        back_right.setDirection(DcMotorSimple.Direction.REVERSE);
 
         basics = new OpModeBasics(front_right, front_left, back_right, back_left);
         wheels = basics.createWheelGroup(front_right, front_left, back_right, back_left);
 
         wheels.setTargetPositions(0);
         wheels.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        wheels.frEncoderReverse = true;
-        wheels.flEncoderReverse = true;
+
+        wheels.fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        wheels.fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        wheels.bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        wheels.br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        //wheels.frEncoderReverse = true;
+        //wheels.flEncoderReverse = true;
         
         //BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         
@@ -78,15 +84,7 @@ public class OMBTest extends OpMode {
         
         //imu.startAccelerationIntegration(new Position(), new Velocity(), 5);
         
-        if (gamepad1.a) {
-            wheels.setTargetPositions(480);
-            wheels.setModes(DcMotor.RunMode.RUN_TO_POSITION);
-            telemetry.addData("encoder", "yes");
-        } else if (gamepad1.b) {
-            wheels.setTargetPositions(0);
-            wheels.setModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            telemetry.addData("encoder", "no");
-        }
+        wheels.setModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         
         //telemetry.addData("OMB", "ready");
@@ -94,6 +92,11 @@ public class OMBTest extends OpMode {
         
         telemetry.update();
         setupComplete = true;
+    }
+
+    @Override
+    public void start() {
+        //basics.moveRobotEncoder(wheels, 0.4, 6, 480, 12.12);
     }
     
     @Override
@@ -107,11 +110,23 @@ public class OMBTest extends OpMode {
         
         //telemetry.addData("Imu Y Position", imu.getPosition().y);
 
-        if (wheels.getTargetPositions().fr == 0) {
+        /*if (wheels.getTargetPositions().fr == 0) {
             wheels.setPower(gamepad1.right_stick_y, gamepad1.left_stick_y);
         } else {
             wheels.setPower(0.5);
+        }*/
+
+        if (gamepad1.dpad_down) {
+            basics.moveRobotEncoder(wheels, -0.4, 12, 480, 12.12);
+        } else if (gamepad1.dpad_up) {
+            basics.moveRobotEncoder(wheels, 0.4, 12, 480, 12.12);
+        } else if (gamepad1.dpad_left) {
+            basics.moveRobotEncoder(wheels, 0.4, -0.4, -0.4, 0.4, 12, 480, 12.12);
+        } else if (gamepad1.dpad_right) {
+            basics.moveRobotEncoder(wheels, -0.4, 0.4, 0.4, -0.4, 12, 480, 12.12);
         }
+
+        telemetry.addData("ticks to victory", Math.abs(basics.inchToTick(6, 480, 12)));
 
         WheelGroup.WheelInts positions = wheels.getCurrentPositions();
 
@@ -119,6 +134,8 @@ public class OMBTest extends OpMode {
         telemetry.addData("fl pos", positions.fl);
         telemetry.addData("br pos", positions.br);
         telemetry.addData("bl pos", positions.bl);
+
+        basics.update();
         
         telemetry.update();
     }

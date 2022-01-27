@@ -1,23 +1,16 @@
 //Motor order: fr, fl, br, bl
 package org.firstinspires.ftc.teamcode.lib;
 
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.Axis;
-import com.qualcomm.robotcore.hardware.Blinker;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Gyroscope;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.Gyroscope;
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 
 public class OpModeBasics {
@@ -34,7 +27,7 @@ public class OpModeBasics {
     private int actionId;
     private double actionVal;
     //soon to be obsolete hopefully, hence this fancy new sub class:
-    private action currentAction;
+    private Action currentAction;
     
     //This might be useful
     
@@ -47,6 +40,12 @@ public class OpModeBasics {
     private DcMotor fl;
     private DcMotor br;
     private DcMotor bl;
+
+    //Variables for encoder directions
+    public EncoderDirection frEncoderDir = EncoderDirection.FORWARD;
+    public EncoderDirection flEncoderDir = EncoderDirection.FORWARD;
+    public EncoderDirection brEncoderDir = EncoderDirection.FORWARD;
+    public EncoderDirection blEncoderDir = EncoderDirection.FORWARD;
     
     //Define imu variable
     private BNO055IMU imu;
@@ -68,6 +67,9 @@ public class OpModeBasics {
         //has access to all hardware
         hasMotors = true;
         hasImu = true;
+
+        //Initialize current action to avoid errors
+        currentAction = new Action();
     }
     
     //Other Constructor
@@ -81,6 +83,15 @@ public class OpModeBasics {
         //Only has motors
         hasMotors = true;
         hasImu = false;
+
+        //I hope nothing explodes
+        currentAction = new Action();
+    }
+
+    //Encoder Direction Enum
+    public enum EncoderDirection {
+        FORWARD,
+        REVERSE
     }
     
 // -Basic power motors commands-
@@ -180,6 +191,25 @@ public class OpModeBasics {
         currentAction.execute();
         
     }
+
+    //Move robot with encoder (wheel group, power, dist, tpr, circumference)
+    public void moveRobotEncoder(WheelGroup wheels, double power, double dist, int tpr, double circumference) {
+        currentAction = new MoveRobotEncoder(wheels, power, dist, tpr, circumference);
+        currentAction.execute();
+    }
+
+    //Move robot with encoder (wheel group, right power, left power, dist, tpr, circumference)
+    public void moveRobotEncoder(WheelGroup wheels, double pr, double pl, double dist, int tpr, double circumference) {
+        currentAction = new MoveRobotEncoder(wheels, pr, pl, dist, tpr, circumference);
+        currentAction.execute();
+    }
+
+    //Move robot with encoder (wheel group, fr power, fl power, br power, bl power, dist, tpr, circumference)
+    public void moveRobotEncoder(WheelGroup wheels, double frPower, double flPower,
+                                 double brPower, double blPower, double dist, int tpr, double circumference) {
+        currentAction = new MoveRobotEncoder(wheels, frPower, flPower, brPower, blPower, dist, tpr, circumference);
+        currentAction.execute();
+    }
     
     
 //Inches -> ticks converter
@@ -191,31 +221,9 @@ public class OpModeBasics {
         
 // -Function for each loop-
     
-    public void basicsUpdate() {
-        //turn towards correctAngle, unless correctAngle > 360
-        
-        /*
-        //If action Id is 1...
-        if (actionId == 1) {
-            //if fr power > 0...
-            if (fl.getPower() > 0) {
-                //if imu angle > action val, stop action
-                if (getAngle() < actionVal) {
-                    powerMotors(0);
-                    actionId = 0;
-                    actionVal = 0;
-                }
-            } else {
-                if (getAngle() > actionVal) {
-                    powerMotors(0);
-                    actionId = 0;
-                    actionVal = 0;
-                }
-            }
-        }
-        */
+    public void update() {
         if (currentAction.loop()) {
-            currentAction = new action();
+            currentAction = new Action();
         }
     }
         
@@ -224,10 +232,10 @@ public class OpModeBasics {
 
     //Wheel group
     public class WheelGroup {
-        private DcMotor fr;
-        private DcMotor fl;
-        private DcMotor br;
-        private DcMotor bl;
+        public DcMotor fr;
+        public DcMotor fl;
+        public DcMotor br;
+        public DcMotor bl;
 
         public boolean frEncoderReverse;
         public boolean flEncoderReverse;
@@ -373,18 +381,154 @@ public class OpModeBasics {
     }
 
 
+
+
     //Actions \/\/\/\/\/\/\/
     //action class
-    private class action {
+    private class Action {
         private boolean done;
         
         public void execute() {}
         public boolean loop() {return true;}
     }
+
+
+    public class MoveRobotEncoder extends Action {
+
+        private WheelGroup wheels;
+
+        private double dist;
+        private int tpr;
+        private double circumference;
+
+        private double frPower;
+        private double flPower;
+        private double brPower;
+        private double blPower;
+
+        private int ticks;
+
+        private int baseTarget;
+        private int frTgt;
+        private int flTgt;
+        private int brTgt;
+        private int blTgt;
+
+        private DcMotor.RunMode startMode;
+
+        //constructors (all have wheel group, dist, tpr, circumference)
+        //Move all simultaneously
+        public MoveRobotEncoder(WheelGroup wheels, double power, double dist,
+                                int tpr, double circumference) {
+            this.wheels = wheels;
+
+            this.frPower = power;
+            this.flPower = power;
+            this.brPower = power;
+            this.blPower = power;
+
+            this.dist = dist;
+            this.tpr = tpr;
+            this.circumference = circumference;
+
+            this.startMode = wheels.fr.getMode();
+        }
+
+        //Move both sides independently
+        public MoveRobotEncoder(WheelGroup wheels, double pr, double pl, double dist,
+                                int tpr, double circumference) {
+            this.wheels = wheels;
+
+            this.frPower = pr;
+            this.flPower = pl;
+            this.brPower = pr;
+            this.blPower = pl;
+
+            this.dist = dist;
+            this.tpr = tpr;
+            this.circumference = circumference;
+
+            this.startMode = wheels.fr.getMode();
+        }
+
+        //Move all independently
+        public MoveRobotEncoder(WheelGroup wheels, double fr, double fl, double br,
+                                double bl, double dist, int tpr, double circumference) {
+            this.wheels = wheels;
+
+            this.frPower = fr;
+            this.flPower = fl;
+            this.brPower = br;
+            this.blPower = bl;
+
+            this.dist = dist;
+            this.tpr = tpr;
+            this.circumference = circumference;
+
+            this.startMode = wheels.fr.getMode();
+        }
+
+
+        //execute function
+        @Override
+        public void execute() {
+            //store abs of dist -> ticks
+            baseTarget = inchToTick(dist, tpr, circumference);
+
+            WheelGroup.WheelInts positions = wheels.getCurrentPositions();
+
+            //Set targets for all motors
+            frTgt = Math.abs(baseTarget + positions.fr);
+            flTgt = Math.abs(baseTarget + positions.fl);
+            brTgt = Math.abs(baseTarget + positions.br);
+            blTgt = Math.abs(baseTarget + positions.bl);
+
+            //power motors
+            wheels.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            wheels.setPower(frPower, flPower, brPower, blPower);
+            //(if motors are in run to position mode, set motor positions to targets)
+        }
+
+        @Override
+        public boolean loop() {
+            //loop function
+            wheels.setModes(startMode);
+            //if (wheels.fr.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
+
+                //if motors are in run to position mode, check if busy
+                //if not busy, power motors off and return true
+           //     return true;
+
+            //} else if (wheels.fr.getMode() == DcMotor.RunMode.RUN_USING_ENCODER ||
+            //           wheels.fr.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
+            //if motors are in other mode, check if abs of current pos >= target pos
+            WheelGroup.WheelInts positions = wheels.getCurrentPositions();
+            if (Math.abs(positions.fr) >= frTgt && Math.abs(positions.fl) >= flTgt &&
+                Math.abs(positions.br) >= brTgt && Math.abs(positions.bl) >= blTgt) {
+
+                    //if true, power motors off and return true
+                    wheels.setPower(0);
+                    return true;
+
+                } else {
+
+                    //otherwise, return false
+                    return false;
+
+                }
+           // } else {
+
+           //     return true;
+
+            //}
+
+        }
+
+    }
     
     
     //action class children
-    public class Turn extends action {
+    public class Turn extends Action {
         
         Orientation globalAngle;
         Orientation lastAngles;
@@ -478,7 +622,7 @@ public class OpModeBasics {
         }
     }
     
-    public class MoveRobot extends action {
+    public class MoveRobot extends Action {
         private double tgtDist;
         private Axis axis;
         private Position startPos;
