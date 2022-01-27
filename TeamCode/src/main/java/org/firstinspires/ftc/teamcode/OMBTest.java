@@ -56,6 +56,9 @@ public class OMBTest extends OpMode {
         wheels.fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         wheels.bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         wheels.br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        //wheels.frEncoderReverse = true;
+        //wheels.flEncoderReverse = true;
         
         //BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         
@@ -127,10 +130,10 @@ public class OMBTest extends OpMode {
 
         WheelGroup.WheelInts positions = wheels.getCurrentPositions();
 
-        telemetry.addData("fr pos", Math.abs(positions.fr));
-        telemetry.addData("fl pos", Math.abs(positions.fl));
-        telemetry.addData("br pos", Math.abs(positions.br));
-        telemetry.addData("bl pos", Math.abs(positions.bl));
+        telemetry.addData("fr pos", positions.fr);
+        telemetry.addData("fl pos", positions.fl);
+        telemetry.addData("br pos", positions.br);
+        telemetry.addData("bl pos", positions.bl);
 
         basics.update();
         

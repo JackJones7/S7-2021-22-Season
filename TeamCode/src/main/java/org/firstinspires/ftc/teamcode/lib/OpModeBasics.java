@@ -67,6 +67,9 @@ public class OpModeBasics {
         //has access to all hardware
         hasMotors = true;
         hasImu = true;
+
+        //Initialize current action to avoid errors
+        currentAction = new Action();
     }
     
     //Other Constructor
@@ -80,6 +83,9 @@ public class OpModeBasics {
         //Only has motors
         hasMotors = true;
         hasImu = false;
+
+        //I hope nothing explodes
+        currentAction = new Action();
     }
 
     //Encoder Direction Enum
@@ -408,6 +414,8 @@ public class OpModeBasics {
         private int brTgt;
         private int blTgt;
 
+        private DcMotor.RunMode startMode;
+
         //constructors (all have wheel group, dist, tpr, circumference)
         //Move all simultaneously
         public MoveRobotEncoder(WheelGroup wheels, double power, double dist,
@@ -422,6 +430,8 @@ public class OpModeBasics {
             this.dist = dist;
             this.tpr = tpr;
             this.circumference = circumference;
+
+            this.startMode = wheels.fr.getMode();
         }
 
         //Move both sides independently
@@ -437,6 +447,8 @@ public class OpModeBasics {
             this.dist = dist;
             this.tpr = tpr;
             this.circumference = circumference;
+
+            this.startMode = wheels.fr.getMode();
         }
 
         //Move all independently
@@ -452,6 +464,8 @@ public class OpModeBasics {
             this.dist = dist;
             this.tpr = tpr;
             this.circumference = circumference;
+
+            this.startMode = wheels.fr.getMode();
         }
 
 
@@ -459,17 +473,18 @@ public class OpModeBasics {
         @Override
         public void execute() {
             //store abs of dist -> ticks
-            baseTarget = Math.abs(inchToTick(dist, tpr, circumference));
+            baseTarget = inchToTick(dist, tpr, circumference);
 
             WheelGroup.WheelInts positions = wheels.getCurrentPositions();
 
             //Set targets for all motors
-            frTgt = baseTarget + Math.abs(positions.fr);
-            flTgt = baseTarget + Math.abs(positions.fl);
-            brTgt = baseTarget + Math.abs(positions.br);
-            blTgt = baseTarget + Math.abs(positions.bl);
+            frTgt = Math.abs(baseTarget + positions.fr);
+            flTgt = Math.abs(baseTarget + positions.fl);
+            brTgt = Math.abs(baseTarget + positions.br);
+            blTgt = Math.abs(baseTarget + positions.bl);
 
             //power motors
+            wheels.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             wheels.setPower(frPower, flPower, brPower, blPower);
             //(if motors are in run to position mode, set motor positions to targets)
         }
@@ -477,6 +492,7 @@ public class OpModeBasics {
         @Override
         public boolean loop() {
             //loop function
+            wheels.setModes(startMode);
             //if (wheels.fr.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
 
                 //if motors are in run to position mode, check if busy
