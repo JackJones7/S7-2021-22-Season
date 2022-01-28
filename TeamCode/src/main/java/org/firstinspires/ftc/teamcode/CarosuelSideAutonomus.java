@@ -276,46 +276,19 @@ public class CarosuelSideAutonomus extends OpMode{
     //New
     public void phase2() {
         if (firstLoop) {
-            //int ticks = basics.inchToTick(28.0, 480, 12.12);
-            
-            /*front_right.setTargetPosition(ticks);
-            front_left.setTargetPosition(ticks);
-            back_right.setTargetPosition(ticks);
-            back_left.setTargetPosition(ticks);*/
             
             if (blueTeam) {
-                basics.powerMotors(-0.5, 0.5, 0.5, -0.5);
+                basics.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 40, 480, 12.12);
             } else {
-                basics.powerMotors(0.5, -0.5, -0.5, 0.5);
+                basics.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 40, 480, 12.12);
             }
-            
+
             firstLoop = false;
         } else {
             
-            int ticks = basics.inchToTick(40.0, 480, 12.12);
-            
-            if (front_right.getCurrentPosition() <= -ticks &&
-            front_left.getCurrentPosition() >= ticks &&
-            back_right.getCurrentPosition() >= ticks &&
-            back_left.getCurrentPosition() <= -ticks && blueTeam) {
-                basics.powerMotors(0);
-                resetEncoders();
-                endPhase();
-            } else if (front_right.getCurrentPosition() >= ticks &&
-            front_left.getCurrentPosition() <= -ticks &&
-            back_right.getCurrentPosition() <= -ticks &&
-            back_left.getCurrentPosition() >= ticks && !blueTeam) {
-                basics.powerMotors(0);
-                resetEncoders();
+            if (!basics.isActionInProgress()) {
                 endPhase();
             }
-            
-            
-            telemetry.addData("tgt ticks", ticks);
-            telemetry.addData("fr pos", front_right.getCurrentPosition());
-            telemetry.addData("fl pos", front_left.getCurrentPosition());
-            telemetry.addData("br pos", back_right.getCurrentPosition());
-            telemetry.addData("bl pos", back_left.getCurrentPosition());
             
         }
     }
