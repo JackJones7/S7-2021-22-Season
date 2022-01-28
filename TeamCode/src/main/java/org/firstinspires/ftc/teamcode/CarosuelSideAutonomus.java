@@ -285,7 +285,8 @@ public class CarosuelSideAutonomus extends OpMode{
 
             firstLoop = false;
         } else {
-            
+
+            basics.update();
             if (!basics.isActionInProgress()) {
                 endPhase();
             }
