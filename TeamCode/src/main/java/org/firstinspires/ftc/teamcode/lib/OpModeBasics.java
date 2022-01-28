@@ -235,8 +235,7 @@ public class OpModeBasics {
     
     public void update() {
         if (actionInProgress) {
-            boolean complete = currentAction.loop();
-            if (complete) {
+            if (currentAction.loop()) {
                 actionInProgress = false;
             }
         }
