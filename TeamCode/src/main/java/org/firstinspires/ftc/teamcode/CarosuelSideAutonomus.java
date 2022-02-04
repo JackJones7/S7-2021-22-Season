@@ -393,17 +393,11 @@ public class CarosuelSideAutonomus extends OpMode{
     public void phase7() {
         if (firstLoop) {
             double distToMove = 11 - distBack.getDistance(DistanceUnit.INCH);
-            ticksToMove = basics.inchToTick(distToMove, 480, 12.12);
-            activateMotors();
-            basics.powerMotors(-0.5);
+            basics.moveRobotEncoder(wheels, -0.4, distToMove, 480, 12.12);
             firstLoop = false;
         } else {
-            if (front_right.getCurrentPosition() <= ticksToMove ||
-                    front_left.getCurrentPosition() <= ticksToMove ||
-                    back_right.getCurrentPosition() <= ticksToMove ||
-                    back_left.getCurrentPosition() <= ticksToMove) {
-                basics.powerMotors(0);
-                resetEncoders();
+            basics.update();
+            if (!basics.isActionInProgress()) {
                 endPhase();
             }
         }
@@ -431,31 +425,15 @@ public class CarosuelSideAutonomus extends OpMode{
         if (firstLoop) {
 
             if (blueTeam) {
-                basics.powerMotors(-0.5, 0.5, 0.5, -0.5);
+                basics.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 26, 480, 12.12);
             } else {
-                basics.powerMotors(0.5, -0.5, -0.5, 0.5);
+                basics.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 26, 480, 12.12);
             }
-
-            activateMotors();
 
             firstLoop = false;
         } else {
-
-            int ticks = basics.inchToTick(26.0, 480, 12.12);
-
-            if (front_right.getCurrentPosition() <= -ticks &&
-                    front_left.getCurrentPosition() >= ticks &&
-                    back_right.getCurrentPosition() >= ticks &&
-                    back_left.getCurrentPosition() <= -ticks && blueTeam) {
-                basics.powerMotors(0);
-                resetEncoders();
-                endPhase();
-            } else if (front_right.getCurrentPosition() >= ticks &&
-                    front_left.getCurrentPosition() <= -ticks &&
-                    back_right.getCurrentPosition() <= -ticks &&
-                    back_left.getCurrentPosition() >= ticks && !blueTeam) {
-                basics.powerMotors(0);
-                resetEncoders();
+            basics.update();
+            if (!basics.isActionInProgress()) {
                 endPhase();
             }
         }
