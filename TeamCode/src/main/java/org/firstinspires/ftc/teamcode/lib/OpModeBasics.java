@@ -507,15 +507,7 @@ public class OpModeBasics {
         public boolean loop() {
             //loop function
             wheels.setModes(startMode);
-            //if (wheels.fr.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
 
-                //if motors are in run to position mode, check if busy
-                //if not busy, power motors off and return true
-           //     return true;
-
-            //} else if (wheels.fr.getMode() == DcMotor.RunMode.RUN_USING_ENCODER ||
-            //           wheels.fr.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
-            //if motors are in other mode, check if abs of current pos >= target pos
             WheelGroup.WheelInts positions = wheels.getCurrentPositions();
             if (Math.abs(positions.fr) >= frTgt && Math.abs(positions.fl) >= flTgt &&
                 Math.abs(positions.br) >= brTgt && Math.abs(positions.bl) >= blTgt) {
@@ -524,17 +516,11 @@ public class OpModeBasics {
                     wheels.setPower(0);
                     return true;
 
-                } else {
-
-                    //otherwise, return false
-                    return false;
-
                 }
-           // } else {
 
-           //     return true;
 
-            //}
+
+            return false;
 
         }
 
