@@ -19,6 +19,7 @@ public class S7TeleOp extends OpMode {
     private DcMotor carouselMotor;
     private DistanceSensor distL;
     private DistanceSensor distR;
+    private DistanceSensor distBack;
     private Blinker expansion_Hub_2;
     private Blinker expansion_Hub_3;
     private DcMotor liftMotor;
@@ -72,6 +73,7 @@ public class S7TeleOp extends OpMode {
 
         distR = hardwareMap.get(DistanceSensor.class, "DistR");
         distL = hardwareMap.get(DistanceSensor.class, "DistL");
+        distBack = hardwareMap.get(DistanceSensor.class, "DistBack");
         
         basics = new OpModeBasics(front_right, front_left, back_right, back_left);
     }
@@ -148,6 +150,7 @@ public class S7TeleOp extends OpMode {
         //telemetry.addData("distL distance", distL.getDistance(DistanceUnit.INCH));
         telemetry.addData("arm position", liftMotor.getCurrentPosition());
         telemetry.addData("arm target", liftMotor.getTargetPosition());
+        telemetry.addData("back dist", distBack.getDistance(DistanceUnit.INCH));
         telemetry.update();
         
     }
