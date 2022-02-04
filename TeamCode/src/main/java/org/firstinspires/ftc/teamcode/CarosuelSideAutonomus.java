@@ -63,7 +63,6 @@ public class CarosuelSideAutonomus extends OpMode{
     protected int index;
     protected float duckLeft;
     protected double distToWall = 0;
-    double distToMove = 0;
     int ticksToMove = 0;
     
     protected enum Level {
@@ -276,46 +275,20 @@ public class CarosuelSideAutonomus extends OpMode{
     //New
     public void phase2() {
         if (firstLoop) {
-            //int ticks = basics.inchToTick(28.0, 480, 12.12);
-            
-            /*front_right.setTargetPosition(ticks);
-            front_left.setTargetPosition(ticks);
-            back_right.setTargetPosition(ticks);
-            back_left.setTargetPosition(ticks);*/
             
             if (blueTeam) {
-                basics.powerMotors(-0.5, 0.5, 0.5, -0.5);
+                basics.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 40, 480, 12.12);
             } else {
-                basics.powerMotors(0.5, -0.5, -0.5, 0.5);
+                basics.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 40, 480, 12.12);
             }
-            
+
             firstLoop = false;
         } else {
-            
-            int ticks = basics.inchToTick(40.0, 480, 12.12);
-            
-            if (front_right.getCurrentPosition() <= -ticks &&
-            front_left.getCurrentPosition() >= ticks &&
-            back_right.getCurrentPosition() >= ticks &&
-            back_left.getCurrentPosition() <= -ticks && blueTeam) {
-                basics.powerMotors(0);
-                resetEncoders();
-                endPhase();
-            } else if (front_right.getCurrentPosition() >= ticks &&
-            front_left.getCurrentPosition() <= -ticks &&
-            back_right.getCurrentPosition() <= -ticks &&
-            back_left.getCurrentPosition() >= ticks && !blueTeam) {
-                basics.powerMotors(0);
-                resetEncoders();
+
+            basics.update();
+            if (!basics.isActionInProgress()) {
                 endPhase();
             }
-            
-            
-            telemetry.addData("tgt ticks", ticks);
-            telemetry.addData("fr pos", front_right.getCurrentPosition());
-            telemetry.addData("fl pos", front_left.getCurrentPosition());
-            telemetry.addData("br pos", back_right.getCurrentPosition());
-            telemetry.addData("bl pos", back_left.getCurrentPosition());
             
         }
     }
@@ -371,24 +344,15 @@ public class CarosuelSideAutonomus extends OpMode{
     
     public void phase4() {
         if (firstLoop) {
-            distToMove = distToWall - distBack.getDistance(DistanceUnit.INCH);
-            ticksToMove = basics.inchToTick(distToMove, 480, 12.12);
-            activateMotors();
-            basics.powerMotors(0.4);
+            double distToMove = distToWall - distBack.getDistance(DistanceUnit.INCH);
+            basics.moveRobotEncoder(wheels, 0.4, distToMove, 480, 12.12);
             firstLoop = false;
         } else {
-            if (front_right.getCurrentPosition() >= ticksToMove ||
-            front_left.getCurrentPosition() >= ticksToMove ||
-            back_right.getCurrentPosition() >= ticksToMove ||
-            back_left.getCurrentPosition() >= ticksToMove) {
-                basics.powerMotors(0);
-                resetEncoders();
+            basics.update();
+            if (!basics.isActionInProgress()) {
                 endPhase();
             }
-            telemetry.addData("fr pos", front_right.getCurrentPosition());
-            telemetry.addData("fl pos", front_left.getCurrentPosition());
-            telemetry.addData("br pos", back_right.getCurrentPosition());
-            telemetry.addData("bl pos", back_left.getCurrentPosition());
+            telemetry.addData("action in progress", basics.isActionInProgress());
         }
     }
     
@@ -408,49 +372,32 @@ public class CarosuelSideAutonomus extends OpMode{
     
     public void phase6() {
         if (firstLoop) {
-            activateMotors();
+
             if (blueTeam) {
-                basics.powerMotors(0.5, -0.5, -0.5, 0.5);
+                basics.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 40, 480, 12.12);
             } else {
-                basics.powerMotors(-0.5, 0.5, 0.5, -0.5);
+                basics.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 40, 480, 12.12);
             }
-            
+
             firstLoop = false;
         } else {
-            int ticks = basics.inchToTick(40.0, 480, 12.12);
-            
-            if (front_right.getCurrentPosition() >= ticks &&
-            front_left.getCurrentPosition() <= -ticks &&
-            back_right.getCurrentPosition() <= -ticks &&
-            back_left.getCurrentPosition() >= ticks && blueTeam) {
-                basics.powerMotors(0);
-                resetEncoders();
-                endPhase();
-            } else if (front_right.getCurrentPosition() <= -ticks &&
-            front_left.getCurrentPosition() >= ticks &&
-            back_right.getCurrentPosition() >= ticks &&
-            back_left.getCurrentPosition() <= -ticks && !blueTeam) {
-                basics.powerMotors(0);
-                resetEncoders();
+
+            basics.update();
+            if (!basics.isActionInProgress()) {
                 endPhase();
             }
+
         }
     }
 
     public void phase7() {
         if (firstLoop) {
-            distToMove = 11 - distBack.getDistance(DistanceUnit.INCH);
-            ticksToMove = basics.inchToTick(distToMove, 480, 12.12);
-            activateMotors();
-            basics.powerMotors(-0.5);
+            double distToMove = 11 - distBack.getDistance(DistanceUnit.INCH);
+            basics.moveRobotEncoder(wheels, -0.4, distToMove, 480, 12.12);
             firstLoop = false;
         } else {
-            if (front_right.getCurrentPosition() <= ticksToMove ||
-                    front_left.getCurrentPosition() <= ticksToMove ||
-                    back_right.getCurrentPosition() <= ticksToMove ||
-                    back_left.getCurrentPosition() <= ticksToMove) {
-                basics.powerMotors(0);
-                resetEncoders();
+            basics.update();
+            if (!basics.isActionInProgress()) {
                 endPhase();
             }
         }
@@ -478,31 +425,15 @@ public class CarosuelSideAutonomus extends OpMode{
         if (firstLoop) {
 
             if (blueTeam) {
-                basics.powerMotors(-0.5, 0.5, 0.5, -0.5);
+                basics.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 26, 480, 12.12);
             } else {
-                basics.powerMotors(0.5, -0.5, -0.5, 0.5);
+                basics.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 26, 480, 12.12);
             }
-
-            activateMotors();
 
             firstLoop = false;
         } else {
-
-            int ticks = basics.inchToTick(26.0, 480, 12.12);
-
-            if (front_right.getCurrentPosition() <= -ticks &&
-                    front_left.getCurrentPosition() >= ticks &&
-                    back_right.getCurrentPosition() >= ticks &&
-                    back_left.getCurrentPosition() <= -ticks && blueTeam) {
-                basics.powerMotors(0);
-                resetEncoders();
-                endPhase();
-            } else if (front_right.getCurrentPosition() >= ticks &&
-                    front_left.getCurrentPosition() <= -ticks &&
-                    back_right.getCurrentPosition() <= -ticks &&
-                    back_left.getCurrentPosition() >= ticks && !blueTeam) {
-                basics.powerMotors(0);
-                resetEncoders();
+            basics.update();
+            if (!basics.isActionInProgress()) {
                 endPhase();
             }
         }

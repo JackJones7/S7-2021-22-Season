@@ -28,6 +28,7 @@ public class OpModeBasics {
     private double actionVal;
     //soon to be obsolete hopefully, hence this fancy new sub class:
     private Action currentAction;
+    private boolean actionInProgress;
     
     //This might be useful
     
@@ -68,8 +69,8 @@ public class OpModeBasics {
         hasMotors = true;
         hasImu = true;
 
-        //Initialize current action to avoid errors
-        currentAction = new Action();
+        //No action running
+        actionInProgress = false;
     }
     
     //Other Constructor
@@ -85,7 +86,7 @@ public class OpModeBasics {
         hasImu = false;
 
         //I hope nothing explodes
-        currentAction = new Action();
+        actionInProgress = false;
     }
 
     //Encoder Direction Enum
@@ -174,6 +175,7 @@ public class OpModeBasics {
             currentAction = new Turn(degrees, power);
             //run execute method
             currentAction.execute();
+            actionInProgress = true;
             
         }
 // ------------
@@ -189,6 +191,7 @@ public class OpModeBasics {
         
         //start it off
         currentAction.execute();
+        actionInProgress = true;
         
     }
 
@@ -196,12 +199,14 @@ public class OpModeBasics {
     public void moveRobotEncoder(WheelGroup wheels, double power, double dist, int tpr, double circumference) {
         currentAction = new MoveRobotEncoder(wheels, power, dist, tpr, circumference);
         currentAction.execute();
+        actionInProgress = true;
     }
 
     //Move robot with encoder (wheel group, right power, left power, dist, tpr, circumference)
     public void moveRobotEncoder(WheelGroup wheels, double pr, double pl, double dist, int tpr, double circumference) {
         currentAction = new MoveRobotEncoder(wheels, pr, pl, dist, tpr, circumference);
         currentAction.execute();
+        actionInProgress = true;
     }
 
     //Move robot with encoder (wheel group, fr power, fl power, br power, bl power, dist, tpr, circumference)
@@ -209,6 +214,7 @@ public class OpModeBasics {
                                  double brPower, double blPower, double dist, int tpr, double circumference) {
         currentAction = new MoveRobotEncoder(wheels, frPower, flPower, brPower, blPower, dist, tpr, circumference);
         currentAction.execute();
+        actionInProgress = true;
     }
     
     
@@ -217,13 +223,21 @@ public class OpModeBasics {
     public int inchToTick(double inch, int tpr, double circ) {
         return Math.toIntExact(Math.round(inch/circ * tpr));
     }
-        
+
+
+//Is action in progress?
+    public boolean isActionInProgress() {
+        return actionInProgress;
+    }
+
         
 // -Function for each loop-
     
     public void update() {
-        if (currentAction.loop()) {
-            currentAction = new Action();
+        if (actionInProgress) {
+            if (currentAction.loop()) {
+                actionInProgress = false;
+            }
         }
     }
         
@@ -385,7 +399,7 @@ public class OpModeBasics {
 
     //Actions \/\/\/\/\/\/\/
     //action class
-    private class Action {
+    private abstract class Action {
         private boolean done;
         
         public void execute() {}
@@ -473,6 +487,7 @@ public class OpModeBasics {
         @Override
         public void execute() {
             //store abs of dist -> ticks
+            wheels.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             baseTarget = inchToTick(dist, tpr, circumference);
 
             WheelGroup.WheelInts positions = wheels.getCurrentPositions();
@@ -484,7 +499,6 @@ public class OpModeBasics {
             blTgt = Math.abs(baseTarget + positions.bl);
 
             //power motors
-            wheels.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             wheels.setPower(frPower, flPower, brPower, blPower);
             //(if motors are in run to position mode, set motor positions to targets)
         }
