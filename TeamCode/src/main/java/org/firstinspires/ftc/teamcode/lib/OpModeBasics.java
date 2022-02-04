@@ -487,6 +487,7 @@ public class OpModeBasics {
         @Override
         public void execute() {
             //store abs of dist -> ticks
+            wheels.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             baseTarget = inchToTick(dist, tpr, circumference);
 
             WheelGroup.WheelInts positions = wheels.getCurrentPositions();
@@ -498,7 +499,6 @@ public class OpModeBasics {
             blTgt = Math.abs(baseTarget + positions.bl);
 
             //power motors
-            wheels.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             wheels.setPower(frPower, flPower, brPower, blPower);
             //(if motors are in run to position mode, set motor positions to targets)
         }
