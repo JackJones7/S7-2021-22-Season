@@ -151,6 +151,7 @@ public class S7TeleOp extends OpMode {
         telemetry.addData("arm position", liftMotor.getCurrentPosition());
         telemetry.addData("arm target", liftMotor.getTargetPosition());
         telemetry.addData("back dist", distBack.getDistance(DistanceUnit.INCH));
+        telemetry.addData("fl pos", front_left.getCurrentPosition());
         telemetry.update();
         
     }
