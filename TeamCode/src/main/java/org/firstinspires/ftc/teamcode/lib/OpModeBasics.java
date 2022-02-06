@@ -428,6 +428,11 @@ public class OpModeBasics {
         private int brTgt;
         private int blTgt;
 
+        private boolean frDone = false;
+        private boolean flDone = false;
+        private boolean brDone = false;
+        private boolean blDone = false;
+
         private DcMotor.RunMode startMode;
 
         //constructors (all have wheel group, dist, tpr, circumference)
@@ -517,19 +522,26 @@ public class OpModeBasics {
             //           wheels.fr.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
             //if motors are in other mode, check if abs of current pos >= target pos
             WheelGroup.WheelInts positions = wheels.getCurrentPositions();
-            if (Math.abs(positions.fr) >= frTgt && Math.abs(positions.fl) >= flTgt &&
-                Math.abs(positions.br) >= brTgt && Math.abs(positions.bl) >= blTgt) {
+            if (positions.fr >= frTgt) {
+                wheels.fr.setPower(0);
+                frDone = true;
+            } if (positions.fl >= flTgt) {
+                wheels.fl.setPower(0);
+                flDone = true;
+            } if (positions.br >= brTgt) {
+                wheels.br.setPower(0);
+                brDone = true;
+            } if (positions.bl >= blTgt) {
+                wheels.bl.setPower(0);
+                blDone = true;
+            }
 
-                    //if true, power motors off and return true
-                    wheels.setPower(0);
-                    return true;
+            if (frDone && flDone && brDone && blDone) {
+                return true;
+            }
 
-                } else {
+            return false;
 
-                    //otherwise, return false
-                    return false;
-
-                }
            // } else {
 
            //     return true;
