@@ -162,10 +162,7 @@ public class CarosuelSideAutonomus extends OpMode{
         back_right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         back_left.setMode(DcMotor.RunMode.RUN_TO_POSITION);*/
         
-        front_right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        front_left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        back_right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        back_left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        wheels.setModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         
         liftMotor.setTargetPosition(0);
         liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -230,10 +227,10 @@ public class CarosuelSideAutonomus extends OpMode{
                             distToWall = 39.0;
                         } else if (duckLeft <= 350 && duckLeft >= 100) {
                             level = Level.MIDDLE;
-                            distToWall = 34.0;
+                            distToWall = 39.0;
                         } else {
                             level = Level.BOTTOM;
-                            distToWall = 34.0;
+                            distToWall = 39.0;
                         }
                         
                         
@@ -277,9 +274,9 @@ public class CarosuelSideAutonomus extends OpMode{
         if (firstLoop) {
             
             if (blueTeam) {
-                basics.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 40, 480, 12.12);
+                basics.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 45, 480, 12.12);
             } else {
-                basics.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 40, 480, 12.12);
+                basics.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 45, 480, 12.12);
             }
 
             firstLoop = false;
