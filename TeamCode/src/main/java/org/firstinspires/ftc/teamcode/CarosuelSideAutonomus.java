@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import java.util.List;
-import java.util.logging.Level;
+
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaCurrentGame;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 
@@ -18,7 +18,6 @@ import com.qualcomm.robotcore.hardware.Blinker;
 import com.qualcomm.robotcore.hardware.Gyroscope;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaCurrentGame;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TfodCurrentGame;
@@ -48,7 +47,7 @@ public class CarosuelSideAutonomus extends OpMode{
     protected VuforiaCurrentGame vuforiaFreightFrenzy;
     protected TfodCurrentGame tfodFreightFrenzy;
     protected List<Recognition> recognitions;
-    protected Recognition duck;
+    protected Recognition element;
     
     protected OpModeBasics basics;
     protected WheelGroup wheels;
@@ -61,7 +60,7 @@ public class CarosuelSideAutonomus extends OpMode{
     protected double endTime;
     protected double strafePower = 0.8;
     protected int index;
-    protected float duckLeft;
+    protected float elementLeft;
     protected double distToWall = 0;
     int ticksToMove = 0;
     
@@ -134,9 +133,14 @@ public class CarosuelSideAutonomus extends OpMode{
             true, //Use object tracker
             true //Enable camera monitoring
         );
+
+        final String[] labels = {
+                "ShippingElement"
+        };
         
         tfodFreightFrenzy.activate();
         tfodFreightFrenzy.setZoom(1, 16 / 9);
+        tfodFreightFrenzy.setModelFromAsset("ShippingElement.tflite", labels);
         
         basics = new OpModeBasics(front_right, front_left, back_right, back_left);
         wheels = basics.createWheelGroup(front_right, front_left, back_right, back_left);
@@ -195,7 +199,7 @@ public class CarosuelSideAutonomus extends OpMode{
             //Spin Carousel
             phase8();
         } else if (phase == 9) {
-            //Strafe straigt to storage unit
+            //Strafe straight to storage unit
             phase9();
         } else if (phase == 10) {
             //Adjust to be completely in storage unit
@@ -213,19 +217,19 @@ public class CarosuelSideAutonomus extends OpMode{
             
             if (recognitions.size() == 0) {
                 level = Level.WHAT;
-                distToWall = 34.0;
-                telemetry.addData("what", "there's no duck");
+                distToWall = 39.0;
+                telemetry.addData("what", "there's no element");
             } else {
                 index = 0;
                 for (Recognition rec : recognitions) {
-                    if (rec.getLabel() == "Duck") {
-                        duck = rec;
-                        duckLeft = duck.getLeft();
+                    if (rec.getLabel() == "ShippingElement") {
+                        element = rec;
+                        elementLeft = element.getLeft();
                         
-                       if (duckLeft >= 450) {
+                       if (elementLeft >= 450) {
                             level = Level.TOP;
                             distToWall = 39.0;
-                        } else if (duckLeft <= 350 && duckLeft >= 100) {
+                        } else if (elementLeft <= 350 && elementLeft >= 100) {
                             level = Level.MIDDLE;
                             distToWall = 39.0;
                         } else {
