@@ -126,6 +126,13 @@ public class CarosuelSideAutonomus extends OpMode{
             0, //Third Angle
             true //Use competition feild target locations
         );
+
+
+        final String[] labels = {
+                "ShippingElement"
+        };
+
+        tfodFreightFrenzy.setModelFromAsset("ShippingElement.tflite", labels);
         
         tfodFreightFrenzy.initialize(
             vuforiaFreightFrenzy, //Vuforia
@@ -134,13 +141,9 @@ public class CarosuelSideAutonomus extends OpMode{
             true //Enable camera monitoring
         );
 
-        final String[] labels = {
-                "ShippingElement"
-        };
         
         tfodFreightFrenzy.activate();
         tfodFreightFrenzy.setZoom(1, 16 / 9);
-        tfodFreightFrenzy.setModelFromAsset("ShippingElement.tflite", labels);
         
         basics = new OpModeBasics(front_right, front_left, back_right, back_left);
         wheels = basics.createWheelGroup(front_right, front_left, back_right, back_left);
