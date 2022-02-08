@@ -113,13 +113,13 @@ public class S7TeleOp extends OpMode {
         
         
         //liftTgt -= gamepad2.left_stick_y * 5;
-        
+        //
         //if (liftTgt < 0) {
         //    liftTgt = 0;
         //} else if (liftTgt > 810) {
         //    liftTgt = 810;
         //}
-        
+        //
         //liftMotor.setTargetPosition(liftTgt);
         liftMotor.setPower(gamepad2.left_stick_y * 0.4);
         

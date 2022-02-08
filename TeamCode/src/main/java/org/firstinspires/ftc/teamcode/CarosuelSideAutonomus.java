@@ -62,6 +62,7 @@ public class CarosuelSideAutonomus extends OpMode{
     protected int index;
     protected float elementLeft;
     protected double distToWall = 0;
+    protected double distToMove = 0;
     int ticksToMove = 0;
     
     protected enum Level {
@@ -193,18 +194,21 @@ public class CarosuelSideAutonomus extends OpMode{
             //Drop freight
             phase5();
         } else if (phase == 6) {
-            //Strafe into wall
+            //Move backwards slightly
             phase6();
         } else if (phase == 7) {
-            //Back up to carousel
+            //Strafe into wall
             phase7();
         } else if (phase == 8) {
-            //Spin Carousel
+            //Back up to carousel
             phase8();
         } else if (phase == 9) {
-            //Strafe straight to storage unit
+            //Spin Carousel
             phase9();
         } else if (phase == 10) {
+            //Strafe straight to storage unit
+            phase10();
+        } else if (phase == 11) {
             //Adjust to be completely in storage unit
             //phase10();
         }
@@ -220,7 +224,7 @@ public class CarosuelSideAutonomus extends OpMode{
             
             if (recognitions.size() == 0) {
                 level = Level.WHAT;
-                distToWall = 39.0;
+                distToWall = 36.0;
                 telemetry.addData("what", "there's no element");
             } else {
                 index = 0;
@@ -234,10 +238,10 @@ public class CarosuelSideAutonomus extends OpMode{
                             distToWall = 39.0;
                         } else if (elementLeft <= 350 && elementLeft >= 100) {
                             level = Level.MIDDLE;
-                            distToWall = 39.0;
+                            distToWall = 36.0;
                         } else {
                             level = Level.BOTTOM;
-                            distToWall = 39.0;
+                            distToWall = 36.0;
                         }
                         
                         
@@ -281,9 +285,9 @@ public class CarosuelSideAutonomus extends OpMode{
         if (firstLoop) {
             
             if (blueTeam) {
-                basics.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 45, 480, 12.12);
+                basics.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 48, 480, 12.12);
             } else {
-                basics.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 45, 480, 12.12);
+                basics.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 48, 480, 12.12);
             }
 
             firstLoop = false;
@@ -348,7 +352,7 @@ public class CarosuelSideAutonomus extends OpMode{
     
     public void phase4() {
         if (firstLoop) {
-            double distToMove = distToWall - distBack.getDistance(DistanceUnit.INCH);
+            distToMove = distToWall - distBack.getDistance(DistanceUnit.INCH);
             basics.moveRobotEncoder(wheels, 0.4, distToMove, 480, 12.12);
             firstLoop = false;
         } else {
@@ -373,14 +377,27 @@ public class CarosuelSideAutonomus extends OpMode{
             }
         }
     }
-    
+
     public void phase6() {
+        if (firstLoop) {
+            basics.moveRobotEncoder(wheels, -0.4, distToMove, 480, 12.12);
+            firstLoop = false;
+        } else {
+            basics.update();
+            if (!basics.isActionInProgress()) {
+                endPhase();
+            }
+            telemetry.addData("action in progress", basics.isActionInProgress());
+        }
+    }
+    
+    public void phase7() {
         if (firstLoop) {
 
             if (blueTeam) {
-                basics.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 40, 480, 12.12);
+                basics.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 48.5, 480, 12.12);
             } else {
-                basics.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 40, 480, 12.12);
+                basics.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 48.5, 480, 12.12);
             }
 
             firstLoop = false;
@@ -394,9 +411,9 @@ public class CarosuelSideAutonomus extends OpMode{
         }
     }
 
-    public void phase7() {
+    public void phase8() {
         if (firstLoop) {
-            double distToMove = 11 - distBack.getDistance(DistanceUnit.INCH);
+            distToMove = 10 - distBack.getDistance(DistanceUnit.INCH);
             basics.moveRobotEncoder(wheels, -0.4, distToMove, 480, 12.12);
             firstLoop = false;
         } else {
@@ -407,7 +424,7 @@ public class CarosuelSideAutonomus extends OpMode{
         }
     }
 
-    public void phase8() {
+    public void phase9() {
         if (firstLoop) {
             if (blueTeam) {
                 carouselMotor.setPower(1);
@@ -425,13 +442,13 @@ public class CarosuelSideAutonomus extends OpMode{
         }
     }
 
-    public void phase9() {
+    public void phase10() {
         if (firstLoop) {
 
             if (blueTeam) {
-                basics.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 26, 480, 12.12);
+                basics.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 30, 480, 12.12);
             } else {
-                basics.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 26, 480, 12.12);
+                basics.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 30, 480, 12.12);
             }
 
             firstLoop = false;
