@@ -24,6 +24,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TfodCurrentGame;
 
 import org.firstinspires.ftc.teamcode.lib.OpModeBasics;
 import org.firstinspires.ftc.teamcode.lib.OpModeBasics.WheelGroup;
+import org.firstinspires.ftc.teamcode.lib.OpModeBasics.ActionManager;
 
 @Autonomous
 
@@ -64,6 +65,8 @@ public class CarosuelSideAutonomus extends OpMode{
     protected double distToWall = 0;
     protected double distToMove = 0;
     int ticksToMove = 0;
+
+    protected OpModeBasics.ActionManager manager;
     
     protected enum Level {
         TOP,
@@ -150,6 +153,10 @@ public class CarosuelSideAutonomus extends OpMode{
         wheels = basics.createWheelGroup(front_right, front_left, back_right, back_left);
         wheels.frEncoderReverse = true;
         wheels.flEncoderReverse = true;
+
+
+        manager = new ActionManager();
+
     }
     
     //start function

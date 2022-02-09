@@ -27,8 +27,7 @@ public class OpModeBasics {
     private int actionId;
     private double actionVal;
     //soon to be obsolete hopefully, hence this fancy new sub class:
-    private Action currentAction;
-    private boolean actionInProgress;
+
     
     //This might be useful
     
@@ -68,9 +67,6 @@ public class OpModeBasics {
         //has access to all hardware
         hasMotors = true;
         hasImu = true;
-
-        //No action running
-        actionInProgress = false;
     }
     
     //Other Constructor
@@ -84,9 +80,6 @@ public class OpModeBasics {
         //Only has motors
         hasMotors = true;
         hasImu = false;
-
-        //I hope nothing explodes
-        actionInProgress = false;
     }
 
     //Encoder Direction Enum
@@ -152,70 +145,13 @@ public class OpModeBasics {
         
     
 // -Turn robot-
-        public void turnRobot(double degrees, double power) {
-            /*
-            //Check if Basics has Motors and Imu
-            if (hasMotors && hasImu && degrees != 0) {
-                //Set action Id to 1 for turning
-                actionId = 1;
-                //Set action val to current imu angle + target degrees
-                actionVal = getAngle() - degrees;
-                
-                //If degrees is negative, turn right
-                if (degrees > 0) {
-                    powerMotors(power * -1, power);
-                } else {
-                    //Otherwise, turn left
-                    powerMotors(power, power * -1);
-                }
-            }
-            */
-            
-            //set current action to turning, with specified parameters
-            currentAction = new Turn(degrees, power);
-            //run execute method
-            currentAction.execute();
-            actionInProgress = true;
-            
-        }
+
 // ------------
 
 
 //Move robot commands
 
-    //Move robot with imu (distance, power, axis)
-    public void moveRobotImu(double dist, double power, Axis axis) {
-        
-        //set current action to new move action with specified params
-        currentAction = new MoveRobot(dist, power, axis);
-        
-        //start it off
-        currentAction.execute();
-        actionInProgress = true;
-        
-    }
 
-    //Move robot with encoder (wheel group, power, dist, tpr, circumference)
-    public void moveRobotEncoder(WheelGroup wheels, double power, double dist, int tpr, double circumference) {
-        currentAction = new MoveRobotEncoder(wheels, power, dist, tpr, circumference);
-        currentAction.execute();
-        actionInProgress = true;
-    }
-
-    //Move robot with encoder (wheel group, right power, left power, dist, tpr, circumference)
-    public void moveRobotEncoder(WheelGroup wheels, double pr, double pl, double dist, int tpr, double circumference) {
-        currentAction = new MoveRobotEncoder(wheels, pr, pl, dist, tpr, circumference);
-        currentAction.execute();
-        actionInProgress = true;
-    }
-
-    //Move robot with encoder (wheel group, fr power, fl power, br power, bl power, dist, tpr, circumference)
-    public void moveRobotEncoder(WheelGroup wheels, double frPower, double flPower,
-                                 double brPower, double blPower, double dist, int tpr, double circumference) {
-        currentAction = new MoveRobotEncoder(wheels, frPower, flPower, brPower, blPower, dist, tpr, circumference);
-        currentAction.execute();
-        actionInProgress = true;
-    }
     
     
 //Inches -> ticks converter
@@ -226,20 +162,12 @@ public class OpModeBasics {
 
 
 //Is action in progress?
-    public boolean isActionInProgress() {
-        return actionInProgress;
-    }
+
 
         
 // -Function for each loop-
     
-    public void update() {
-        if (actionInProgress) {
-            if (currentAction.loop()) {
-                actionInProgress = false;
-            }
-        }
-    }
+
         
 // ------------------------
 
@@ -398,301 +326,375 @@ public class OpModeBasics {
 
 
     //Actions \/\/\/\/\/\/\/
-    //action class
-    private abstract class Action {
-        private boolean done;
-        
-        public void execute() {}
-        public boolean loop() {return true;}
-    }
 
-
-    public class MoveRobotEncoder extends Action {
-
-        private WheelGroup wheels;
-
-        private double dist;
-        private int tpr;
-        private double circumference;
-
-        private double frPower;
-        private double flPower;
-        private double brPower;
-        private double blPower;
-
-        private int ticks;
-
-        private int baseTarget;
-        private int frTgt;
-        private int flTgt;
-        private int brTgt;
-        private int blTgt;
-
-        private boolean frDone = false;
-        private boolean flDone = false;
-        private boolean brDone = false;
-        private boolean blDone = false;
-
-        private DcMotor.RunMode startMode;
-
-        //constructors (all have wheel group, dist, tpr, circumference)
-        //Move all simultaneously
-        public MoveRobotEncoder(WheelGroup wheels, double power, double dist,
-                                int tpr, double circumference) {
-            this.wheels = wheels;
-
-            this.frPower = power;
-            this.flPower = power;
-            this.brPower = power;
-            this.blPower = power;
-
-            this.dist = dist;
-            this.tpr = tpr;
-            this.circumference = circumference;
-
-            this.startMode = wheels.fr.getMode();
+    //instantiable action manager
+    public static class ActionManager {
+        public ActionManager () {
+            actionInProgress = false;
         }
 
-        //Move both sides independently
-        public MoveRobotEncoder(WheelGroup wheels, double pr, double pl, double dist,
-                                int tpr, double circumference) {
-            this.wheels = wheels;
+        private Action currentAction;
+        private boolean actionInProgress;
 
-            this.frPower = pr;
-            this.flPower = pl;
-            this.brPower = pr;
-            this.blPower = pl;
 
-            this.dist = dist;
-            this.tpr = tpr;
-            this.circumference = circumference;
+        //action class
+        private abstract class Action {
+            private boolean done;
 
-            this.startMode = wheels.fr.getMode();
-        }
-
-        //Move all independently
-        public MoveRobotEncoder(WheelGroup wheels, double fr, double fl, double br,
-                                double bl, double dist, int tpr, double circumference) {
-            this.wheels = wheels;
-
-            this.frPower = fr;
-            this.flPower = fl;
-            this.brPower = br;
-            this.blPower = bl;
-
-            this.dist = dist;
-            this.tpr = tpr;
-            this.circumference = circumference;
-
-            this.startMode = wheels.fr.getMode();
+            public void execute() {}
+            public boolean loop() {return true;}
         }
 
 
-        //execute function
-        @Override
-        public void execute() {
-            //store abs of dist -> ticks
-            wheels.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            baseTarget = inchToTick(dist, tpr, circumference);
+        public class MoveRobotEncoder extends Action {
 
-            WheelGroup.WheelInts positions = wheels.getCurrentPositions();
+            private WheelGroup wheels;
 
-            //Set targets for all motors
-            frTgt = Math.abs(baseTarget + positions.fr);
-            flTgt = Math.abs(baseTarget + positions.fl);
-            brTgt = Math.abs(baseTarget + positions.br);
-            blTgt = Math.abs(baseTarget + positions.bl);
+            private double dist;
+            private int tpr;
+            private double circumference;
 
-            //power motors
-            wheels.setPower(frPower, flPower, brPower, blPower);
-            //(if motors are in run to position mode, set motor positions to targets)
-        }
+            private double frPower;
+            private double flPower;
+            private double brPower;
+            private double blPower;
 
-        @Override
-        public boolean loop() {
-            //loop function
-            wheels.setModes(startMode);
+            private int ticks;
 
-            WheelGroup.WheelInts positions = wheels.getCurrentPositions();
-            if (Math.abs(positions.fr) >= frTgt) {
-                wheels.fr.setPower(0);
-                frDone = true;
-            } if (Math.abs(positions.fl) >= flTgt) {
-                wheels.fl.setPower(0);
-                flDone = true;
-            } if (Math.abs(positions.br) >= brTgt) {
-                wheels.br.setPower(0);
-                brDone = true;
-            } if (Math.abs(positions.bl) >= blTgt) {
-                wheels.bl.setPower(0);
-                blDone = true;
+            private int baseTarget;
+            private int frTgt;
+            private int flTgt;
+            private int brTgt;
+            private int blTgt;
+
+            private boolean frDone = false;
+            private boolean flDone = false;
+            private boolean brDone = false;
+            private boolean blDone = false;
+
+            private DcMotor.RunMode startMode;
+
+            //constructors (all have wheel group, dist, tpr, circumference)
+            //Move all simultaneously
+            public MoveRobotEncoder(WheelGroup wheels, double power, double dist,
+                                    int tpr, double circumference) {
+                this.wheels = wheels;
+
+                this.frPower = power;
+                this.flPower = power;
+                this.brPower = power;
+                this.blPower = power;
+
+                this.dist = dist;
+                this.tpr = tpr;
+                this.circumference = circumference;
+
+                this.startMode = wheels.fr.getMode();
             }
 
-            if (frDone && flDone && brDone && blDone) {
-                return true;
+            //Move both sides independently
+            public MoveRobotEncoder(WheelGroup wheels, double pr, double pl, double dist,
+                                    int tpr, double circumference) {
+                this.wheels = wheels;
+
+                this.frPower = pr;
+                this.flPower = pl;
+                this.brPower = pr;
+                this.blPower = pl;
+
+                this.dist = dist;
+                this.tpr = tpr;
+                this.circumference = circumference;
+
+                this.startMode = wheels.fr.getMode();
             }
 
-            return false;
+            //Move all independently
+            public MoveRobotEncoder(WheelGroup wheels, double fr, double fl, double br,
+                                    double bl, double dist, int tpr, double circumference) {
+                this.wheels = wheels;
 
-           // } else {
+                this.frPower = fr;
+                this.flPower = fl;
+                this.brPower = br;
+                this.blPower = bl;
 
-           //     return true;
+                this.dist = dist;
+                this.tpr = tpr;
+                this.circumference = circumference;
 
-            //}
+                this.startMode = wheels.fr.getMode();
+            }
+
+
+            //execute function
+            @Override
+            public void execute() {
+                //store abs of dist -> ticks
+                wheels.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                baseTarget = inchToTick(dist, tpr, circumference);
+
+                WheelGroup.WheelInts positions = wheels.getCurrentPositions();
+
+                //Set targets for all motors
+                frTgt = Math.abs(baseTarget + positions.fr);
+                flTgt = Math.abs(baseTarget + positions.fl);
+                brTgt = Math.abs(baseTarget + positions.br);
+                blTgt = Math.abs(baseTarget + positions.bl);
+
+                //power motors
+                wheels.setPower(frPower, flPower, brPower, blPower);
+                //(if motors are in run to position mode, set motor positions to targets)
+            }
+
+            @Override
+            public boolean loop() {
+                //loop function
+                wheels.setModes(startMode);
+
+                WheelGroup.WheelInts positions = wheels.getCurrentPositions();
+                if (Math.abs(positions.fr) >= frTgt) {
+                    wheels.fr.setPower(0);
+                    frDone = true;
+                } if (Math.abs(positions.fl) >= flTgt) {
+                    wheels.fl.setPower(0);
+                    flDone = true;
+                } if (Math.abs(positions.br) >= brTgt) {
+                    wheels.br.setPower(0);
+                    brDone = true;
+                } if (Math.abs(positions.bl) >= blTgt) {
+                    wheels.bl.setPower(0);
+                    blDone = true;
+                }
+
+                if (frDone && flDone && brDone && blDone) {
+                    return true;
+                }
+
+                return false;
+
+                // } else {
+
+                //     return true;
+
+                //}
+
+            }
 
         }
 
-    }
-    
-    
-    //action class children
-    public class Turn extends Action {
-        
-        Orientation globalAngle;
-        Orientation lastAngles;
-        
-        private double tgtAngle = 0;
-        private double power = 0;
-        private double realAngle = 0;
-        
-        
-        public Turn (double tgtAngle, double power) {
-            this.tgtAngle = tgtAngle;
-            this.power = power;
-            
-            globalAngle = new Orientation();
-            lastAngles = new Orientation();
-        }
-        
-        public void execute() {
-            //Check if Basics has Motors and Imu
-            if (hasMotors && hasImu && tgtAngle != 0) {
-                //Set target angle to current imu angle + target degrees
-                realAngle = getAngle().thirdAngle + tgtAngle;
-                
-                //If degrees is negative, turn left
-                if (tgtAngle > 0) {
-                    powerMotors(power, power * -1);
+
+        //action class children
+        public class Turn extends Action {
+
+            Orientation globalAngle;
+            Orientation lastAngles;
+
+            private double tgtAngle = 0;
+            private double power = 0;
+            private double realAngle = 0;
+
+
+            public Turn (double tgtAngle, double power) {
+                this.tgtAngle = tgtAngle;
+                this.power = power;
+
+                globalAngle = new Orientation();
+                lastAngles = new Orientation();
+            }
+
+            public void execute() {
+                //Check if Basics has Motors and Imu
+                if (hasMotors && hasImu && tgtAngle != 0) {
+                    //Set target angle to current imu angle + target degrees
+                    realAngle = getAngle().thirdAngle + tgtAngle;
+
+                    //If degrees is negative, turn left
+                    if (tgtAngle > 0) {
+                        powerMotors(power, power * -1);
+                    } else {
+                        //Otherwise, turn right
+                        powerMotors(power * -1, power);
+                    }
+                }
+            }
+
+            public boolean loop() {
+                //if fr power > 0...
+                if (fr.getPower() > 0) {
+                    //if imu angle <= tgt angle, stop action
+                    if (getAngle().thirdAngle <= realAngle) {
+                        powerMotors(0);
+                        return true;
+                    }
                 } else {
-                    //Otherwise, turn right
-                    powerMotors(power * -1, power);
+                    if (getAngle().thirdAngle >= realAngle) {
+                        powerMotors(0);
+                        return true;
+                    }
                 }
+                return false;
             }
-        }
-        
-        public boolean loop() {
-            //if fr power > 0...
-            if (fr.getPower() > 0) {
-                //if imu angle <= tgt angle, stop action
-                if (getAngle().thirdAngle <= realAngle) {
-                    powerMotors(0);
-                    return true;
-                }
-            } else {
-                if (getAngle().thirdAngle >= realAngle) {
-                    powerMotors(0);
-                    return true;
-                }
-            }
-            return false;
-        }
-        
-        //getAngle method
 
-        public Orientation getAngle() {
-        
-            //This method is "borrowed" from an example by StemRobotics.
-            //https://github.com/stemrobotics/Tetrix-Exercises/blob/master/DriveAvoidImu.java
-            //line 149
-            //Thanks, man
-        
-            Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        
-            double deltaAngleZ = angles.firstAngle - lastAngles.firstAngle;
-            double deltaAngleY = angles.secondAngle - lastAngles.secondAngle;
-            double deltaAngleX = angles.thirdAngle - lastAngles.thirdAngle;
-        
-        
-            if (deltaAngleX < -180) {
-                deltaAngleX += 360;
-            } else if (deltaAngleX > 180) {
-                deltaAngleX -= 360;
+            //getAngle method
+
+            public Orientation getAngle() {
+
+                //This method is "borrowed" from an example by StemRobotics.
+                //https://github.com/stemrobotics/Tetrix-Exercises/blob/master/DriveAvoidImu.java
+                //line 149
+                //Thanks, man
+
+                Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+                double deltaAngleZ = angles.firstAngle - lastAngles.firstAngle;
+                double deltaAngleY = angles.secondAngle - lastAngles.secondAngle;
+                double deltaAngleX = angles.thirdAngle - lastAngles.thirdAngle;
+
+
+                if (deltaAngleX < -180) {
+                    deltaAngleX += 360;
+                } else if (deltaAngleX > 180) {
+                    deltaAngleX -= 360;
+                }
+                if (deltaAngleY < -180) {
+                    deltaAngleY += 360;
+                } else if (deltaAngleX > 180) {
+                    deltaAngleY -= 360;
+                }
+                if (deltaAngleZ < -180) {
+                    deltaAngleZ += 360;
+                } else if (deltaAngleX > 180) {
+                    deltaAngleZ -= 360;
+                }
+
+                globalAngle.firstAngle += deltaAngleX;
+                globalAngle.secondAngle += deltaAngleY;
+                globalAngle.thirdAngle += deltaAngleZ;
+
+                lastAngles = angles;
+
+                return globalAngle;
+
             }
-            if (deltaAngleY < -180) {
-                deltaAngleY += 360;
-            } else if (deltaAngleX > 180) {
-                deltaAngleY -= 360;
-            }
-            if (deltaAngleZ < -180) {
-                deltaAngleZ += 360;
-            } else if (deltaAngleX > 180) {
-                deltaAngleZ -= 360;
-            }
-        
-            globalAngle.firstAngle += deltaAngleX;
-            globalAngle.secondAngle += deltaAngleY;
-            globalAngle.thirdAngle += deltaAngleZ;
-            
-            lastAngles = angles;
-        
-            return globalAngle;
-        
         }
+
+        public class MoveRobot extends Action {
+            private double tgtDist;
+            private Axis axis;
+            private Position startPos;
+            private Position endPos;
+
+            private double movedDist;
+
+            private double frPower;
+            private double flPower;
+            private double brPower;
+            private double blPower;
+
+            public MoveRobot(double tgtDist, double power, Axis axis) {
+                this.tgtDist = tgtDist;
+                this.frPower = power;
+                this.flPower = power;
+                this.brPower = power;
+                this.blPower = power;
+            }
+
+            public void execute() {
+                //get the starting position
+                startPos = imu.getPosition();
+                //power motors to specified power
+                powerMotors(frPower, flPower, brPower, blPower);
+            }
+
+            public boolean loop() {
+                //get travelled dist according to specified axis
+                endPos = imu.getPosition();
+                if (axis == Axis.X) {
+                    movedDist = endPos.x - startPos.x;
+                } else if (axis == Axis.Y) {
+                    movedDist = endPos.y - startPos.y;
+                } else if (axis == Axis.Z) {
+                    movedDist = endPos.z - startPos.z;
+                } else {
+                    //what the heck just happened
+                    //I quit
+                    powerMotors(0);
+                    return true;
+                }
+
+                //if travelled dist >= target dist, end action
+                if (movedDist >= tgtDist) {
+                    powerMotors(0);
+                    return true;
+                }
+
+                //otherwise, the action is still in progress
+                return false;
+            }
     }
-    
-    public class MoveRobot extends Action {
-        private double tgtDist;
-        private Axis axis;
-        private Position startPos;
-        private Position endPos;
-        
-        private double movedDist;
-        
-        private double frPower;
-        private double flPower;
-        private double brPower;
-        private double blPower;
-        
-        public MoveRobot(double tgtDist, double power, Axis axis) {
-            this.tgtDist = tgtDist;
-            this.frPower = power;
-            this.flPower = power;
-            this.brPower = power;
-            this.blPower = power;
+
+
+    //Methods to run actions
+
+        public void turnRobot(double degrees, double power) {
+
+            //set current action to turning, with specified parameters
+            currentAction = new Turn(degrees, power);
+            //run execute method
+            currentAction.execute();
+            actionInProgress = true;
+
         }
-        
-        public void execute() {
-            //get the starting position
-            startPos = imu.getPosition();
-            //power motors to specified power
-            powerMotors(frPower, flPower, brPower, blPower);
+
+
+        //Move robot with imu (distance, power, axis)
+        public void moveRobotImu(double dist, double power, Axis axis) {
+
+            //set current action to new move action with specified params
+            currentAction = new MoveRobot(dist, power, axis);
+
+            //start it off
+            currentAction.execute();
+            actionInProgress = true;
+
         }
-        
-        public boolean loop() {
-            //get travelled dist according to specified axis
-            endPos = imu.getPosition();
-            if (axis == Axis.X) {
-                movedDist = endPos.x - startPos.x;
-            } else if (axis == Axis.Y) {
-                movedDist = endPos.y - startPos.y;
-            } else if (axis == Axis.Z) {
-                movedDist = endPos.z - startPos.z;
-            } else {
-                //what the heck just happened
-                //I quit
-                powerMotors(0);
-                return true;
+
+        //Move robot with encoder (wheel group, power, dist, tpr, circumference)
+        public void moveRobotEncoder(WheelGroup wheels, double power, double dist, int tpr, double circumference) {
+            currentAction = new MoveRobotEncoder(wheels, power, dist, tpr, circumference);
+            currentAction.execute();
+            actionInProgress = true;
+        }
+
+        //Move robot with encoder (wheel group, right power, left power, dist, tpr, circumference)
+        public void moveRobotEncoder(WheelGroup wheels, double pr, double pl, double dist, int tpr, double circumference) {
+            currentAction = new MoveRobotEncoder(wheels, pr, pl, dist, tpr, circumference);
+            currentAction.execute();
+            actionInProgress = true;
+        }
+
+        //Move robot with encoder (wheel group, fr power, fl power, br power, bl power, dist, tpr, circumference)
+        public void moveRobotEncoder(WheelGroup wheels, double frPower, double flPower,
+                                     double brPower, double blPower, double dist, int tpr, double circumference) {
+            currentAction = new MoveRobotEncoder(wheels, frPower, flPower, brPower, blPower, dist, tpr, circumference);
+            currentAction.execute();
+            actionInProgress = true;
+        }
+
+        //other methods
+        public boolean isActionInProgress() {
+            return actionInProgress;
+        }
+
+        public void update() {
+            if (actionInProgress) {
+                if (currentAction.loop()) {
+                    actionInProgress = false;
+                }
             }
-            
-            //if travelled dist >= target dist, end action
-            if (movedDist >= tgtDist) {
-                powerMotors(0);
-                return true;
-            }
-            
-            //otherwise, the action is still in progress
-            return false;
         }
+
     }
 
 
