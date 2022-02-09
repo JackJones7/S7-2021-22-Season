@@ -327,8 +327,15 @@ public class OpModeBasics {
 
     //Actions \/\/\/\/\/\/\/
 
+
+    //create action manager
+    public ActionManager createActionManager () {
+        return new ActionManager();
+    }
+
+
     //instantiable action manager
-    public static class ActionManager {
+    public class ActionManager {
         public ActionManager () {
             actionInProgress = false;
         }

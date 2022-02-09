@@ -49,7 +49,7 @@ public class CarosuelSideAutonomus extends OpMode{
     protected TfodCurrentGame tfodFreightFrenzy;
     protected List<Recognition> recognitions;
     protected Recognition element;
-    
+
     protected OpModeBasics basics;
     protected WheelGroup wheels;
 
@@ -148,14 +148,14 @@ public class CarosuelSideAutonomus extends OpMode{
         
         tfodFreightFrenzy.activate();
         tfodFreightFrenzy.setZoom(1, 16 / 9);
-        
-        basics = new OpModeBasics(front_right, front_left, back_right, back_left);
+
+
         wheels = basics.createWheelGroup(front_right, front_left, back_right, back_left);
         wheels.frEncoderReverse = true;
         wheels.flEncoderReverse = true;
 
 
-        manager = new ActionManager();
+        manager = basics.createActionManager();
 
     }
     
@@ -292,16 +292,16 @@ public class CarosuelSideAutonomus extends OpMode{
         if (firstLoop) {
             
             if (blueTeam) {
-                basics.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 48, 480, 12.12);
+                 manager.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 48, 480, 12.12);
             } else {
-                basics.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 48, 480, 12.12);
+                manager.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 48, 480, 12.12);
             }
 
             firstLoop = false;
         } else {
 
-            basics.update();
-            if (!basics.isActionInProgress()) {
+            manager.update();
+            if (!manager.isActionInProgress()) {
                 endPhase();
             }
             
@@ -360,14 +360,14 @@ public class CarosuelSideAutonomus extends OpMode{
     public void phase4() {
         if (firstLoop) {
             distToMove = distToWall - distBack.getDistance(DistanceUnit.INCH);
-            basics.moveRobotEncoder(wheels, 0.4, distToMove, 480, 12.12);
+            manager.moveRobotEncoder(wheels, 0.4, distToMove, 480, 12.12);
             firstLoop = false;
         } else {
-            basics.update();
-            if (!basics.isActionInProgress()) {
+            manager.update();
+            if (!manager.isActionInProgress()) {
                 endPhase();
             }
-            telemetry.addData("action in progress", basics.isActionInProgress());
+            telemetry.addData("action in progress", manager.isActionInProgress());
         }
     }
     
@@ -387,14 +387,14 @@ public class CarosuelSideAutonomus extends OpMode{
 
     public void phase6() {
         if (firstLoop) {
-            basics.moveRobotEncoder(wheels, -0.4, distToMove, 480, 12.12);
+            manager.moveRobotEncoder(wheels, -0.4, distToMove, 480, 12.12);
             firstLoop = false;
         } else {
-            basics.update();
-            if (!basics.isActionInProgress()) {
+            manager.update();
+            if (!manager.isActionInProgress()) {
                 endPhase();
             }
-            telemetry.addData("action in progress", basics.isActionInProgress());
+            telemetry.addData("action in progress", manager.isActionInProgress());
         }
     }
     
@@ -402,16 +402,16 @@ public class CarosuelSideAutonomus extends OpMode{
         if (firstLoop) {
 
             if (blueTeam) {
-                basics.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 48.5, 480, 12.12);
+                manager.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 48.5, 480, 12.12);
             } else {
-                basics.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 48.5, 480, 12.12);
+                manager.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 48.5, 480, 12.12);
             }
 
             firstLoop = false;
         } else {
 
-            basics.update();
-            if (!basics.isActionInProgress()) {
+            manager.update();
+            if (!manager.isActionInProgress()) {
                 endPhase();
             }
 
@@ -421,11 +421,11 @@ public class CarosuelSideAutonomus extends OpMode{
     public void phase8() {
         if (firstLoop) {
             distToMove = 10 - distBack.getDistance(DistanceUnit.INCH);
-            basics.moveRobotEncoder(wheels, -0.4, distToMove, 480, 12.12);
+            manager.moveRobotEncoder(wheels, -0.4, distToMove, 480, 12.12);
             firstLoop = false;
         } else {
-            basics.update();
-            if (!basics.isActionInProgress()) {
+            manager.update();
+            if (!manager.isActionInProgress()) {
                 endPhase();
             }
         }
@@ -453,15 +453,15 @@ public class CarosuelSideAutonomus extends OpMode{
         if (firstLoop) {
 
             if (blueTeam) {
-                basics.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 30, 480, 12.12);
+                manager.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 30, 480, 12.12);
             } else {
-                basics.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 30, 480, 12.12);
+                manager.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 30, 480, 12.12);
             }
 
             firstLoop = false;
         } else {
-            basics.update();
-            if (!basics.isActionInProgress()) {
+            manager.update();
+            if (!manager.isActionInProgress()) {
                 endPhase();
             }
         }
