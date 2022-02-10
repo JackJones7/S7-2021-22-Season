@@ -190,35 +190,41 @@ public class CarosuelSideAutonomus extends OpMode{
             //detect duck position
             phase1();
         } else if (phase == 2) {
-            //Strafe to align with shipping hub
-            phase2();
-        } else if (phase == 3) {
-            //Elevate lift to correct level
+            //Strafe to align with shipping hub (elevate lift)
+            //phase2();
             phase3();
-        } else if (phase == 4) {
-            //calculate dist to hub and move forward to shipping hub
-            phase4();
-        } else if (phase == 5) {
-            //Drop freight
-            phase5();
-        } else if (phase == 6) {
-            //Move backwards slightly
-            phase6();
-        } else if (phase == 7) {
-            //Strafe into wall
-            phase7();
-        } else if (phase == 8) {
-            //Back up to carousel
+        } else if (phase == 3) {
+            //Elevate lift to correct level (move backwards)
+            //phase3();
             phase8();
-        } else if (phase == 9) {
-            //Spin Carousel
+        } else if (phase == 4) {
+            //calculate dist to hub and move forward to shipping hub (spin carousel)
+            //phase4();
             phase9();
+        } else if (phase == 5) {
+            //Drop freight (strafe to shipping hub)
+            //phase5();
+            phase2();
+        } else if (phase == 6) {
+            //Move backwards slightly (move up to hub)
+            //phase6();
+            phase4();
+        } else if (phase == 7) {
+            //Strafe into wall (drop freight)
+            //phase7();
+            phase5();
+        } else if (phase == 8) {
+            //Back up to carousel (back up to wall)
+            //phase8();
+            phase11();
+        } else if (phase == 9) {
+            //Spin Carousel (strafe to storage unit)
+            //phase9();
         } else if (phase == 10) {
             //Strafe straight to storage unit
-            phase10();
+            //phase10();
         } else if (phase == 11) {
             //Adjust to be completely in storage unit
-            //phase10();
         }
         telemetry.addData("phase", phase);
         telemetry.addData("ticks to move", ticksToMove);
@@ -465,6 +471,18 @@ public class CarosuelSideAutonomus extends OpMode{
             if (!basics.isActionInProgress()) {
                 endPhase();
             }
+        }
+    }
+
+    public void phase11() {
+        if (firstLoop) {
+            distToMove = distBack.getDistance(DistanceUnit.INCH);
+            basics.moveRobotEncoder(wheels, -0.4, distToMove, 480, 12.12);
+        } else {
+            if (basics.isActionInProgress()) {
+                return;
+            }
+            endPhase();
         }
     }
     
