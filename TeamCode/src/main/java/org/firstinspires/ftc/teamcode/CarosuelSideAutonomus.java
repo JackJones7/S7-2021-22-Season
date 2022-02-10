@@ -192,35 +192,35 @@ public class CarosuelSideAutonomus extends OpMode{
         } else if (phase == 2) {
             //Strafe to align with shipping hub (elevate lift)
             //phase2();
-            phase3();
+            phase2();
         } else if (phase == 3) {
             //Elevate lift to correct level (move backwards)
             //phase3();
-            phase8();
+            phase3();
         } else if (phase == 4) {
             //calculate dist to hub and move forward to shipping hub (spin carousel)
             //phase4();
-            phase9();
+            phase4();
         } else if (phase == 5) {
             //Drop freight (strafe to shipping hub)
             //phase5();
-            phase2();
+            phase5();
         } else if (phase == 6) {
             //Move backwards slightly (move up to hub)
             //phase6();
-            phase4();
+            phase6();
         } else if (phase == 7) {
             //Strafe into wall (drop freight)
             //phase7();
-            phase5();
+            phase7();
         } else if (phase == 8) {
             //Back up to carousel (back up to wall)
             //phase8();
-            phase11();
+            phase8();
         } else if (phase == 9) {
             //Spin Carousel (strafe to storage unit)
             //phase9();
-            phase12();
+            phase9();
         } else if (phase == 10) {
             //Strafe straight to storage unit
             //phase10();
@@ -274,9 +274,39 @@ public class CarosuelSideAutonomus extends OpMode{
             endPhase();
         }
     }
-    
-    //Old
-    /*public void phase2() {
+
+    public void phase2() {
+        if (firstLoop) {
+            if (level == Level.TOP) {
+                liftMotor.setTargetPosition(643);
+            } else if (level == Level.MIDDLE) {
+                liftMotor.setTargetPosition(409);
+            } else {
+                liftMotor.setTargetPosition(190);
+            }
+            liftMotor.setPower(0.5);
+            firstLoop = false;
+        } else {
+            if (!liftMotor.isBusy()) {
+                endPhase();
+            }
+        }
+    }
+
+    public void phase3() {
+        if (firstLoop) {
+            distToMove = 10 - distBack.getDistance(DistanceUnit.INCH);
+            basics.moveRobotEncoder(wheels, -0.4, distToMove, 480, 12.12);
+            firstLoop = false;
+        } else {
+            basics.update();
+            if (!basics.isActionInProgress()) {
+                endPhase();
+            }
+        }
+    }
+
+    public void phase4() {
         if (firstLoop) {
             if (blueTeam) {
                 carouselMotor.setPower(1);
@@ -287,16 +317,14 @@ public class CarosuelSideAutonomus extends OpMode{
             firstLoop = false;
         } else {
             endTime = runtime.time(TimeUnit.SECONDS);
-            telemetry.addData("carousel motor power", carouselMotor.getPower());
-            if (endTime - startTime >= 4.5) {
+            if (endTime - startTime >= 5) {
                 carouselMotor.setPower(0);
                 endPhase();
             }
         }
-    }*/
-    
-    //New
-    public void phase2() {
+    }
+
+    public void phase5() {
         if (firstLoop) {
             
             if (blueTeam) {
@@ -315,57 +343,8 @@ public class CarosuelSideAutonomus extends OpMode{
             
         }
     }
-    
-    //old
-    /*public void phase3() {
-        if (firstLoop) {
-            if (blueTeam) {
-                basics.powerMotors(-strafePower, strafePower, strafePower, -strafePower);
-            } else {
-                basics.powerMotors(strafePower, -strafePower, -strafePower, strafePower);
-            }
-            startTime = runtime.time(TimeUnit.SECONDS);
-            firstLoop = false;
-        } else {
-            endTime = runtime.time(TimeUnit.SECONDS);
-            if (endTime - startTime >= 1) {
-                basics.powerMotors(0);
-                endPhase();
-            }
-        }
-    }*/
-    
-    public void phase3() {
-        if (firstLoop) {
-            if (level == Level.TOP) {
-                liftMotor.setTargetPosition(643);
-            } else if (level == Level.MIDDLE) {
-                liftMotor.setTargetPosition(409);
-            } else {
-                liftMotor.setTargetPosition(190);
-            }
-            liftMotor.setPower(0.5);
-            firstLoop = false;
-        } else {
-            if (!liftMotor.isBusy()) {
-                endPhase();
-            }
-        }
-    }
-    
-    //old
-    /*public void phase4() {
-        if (firstLoop) {
-            basics.powerMotors(-0.4);
-            firstLoop = false;
-        } else {
-            if (distBack.getDistance(DistanceUnit.INCH) <= 5) {
-                basics.powerMotors(0);
-            }
-        }
-    }*/
-    
-    public void phase4() {
+
+    public void phase6() {
         if (firstLoop) {
             distToMove = distToWall - distBack.getDistance(DistanceUnit.INCH);
             basics.moveRobotEncoder(wheels, 0.4, distToMove, 480, 12.12);
@@ -379,7 +358,7 @@ public class CarosuelSideAutonomus extends OpMode{
         }
     }
     
-    public void phase5() {
+    public void phase7() {
         if (firstLoop) {
             left_intake.setPosition(0.1);
             right_intake.setPosition(0.1);
@@ -393,89 +372,7 @@ public class CarosuelSideAutonomus extends OpMode{
         }
     }
 
-    public void phase6() {
-        if (firstLoop) {
-            basics.moveRobotEncoder(wheels, -0.4, distToMove, 480, 12.12);
-            firstLoop = false;
-        } else {
-            basics.update();
-            if (!basics.isActionInProgress()) {
-                endPhase();
-            }
-            telemetry.addData("action in progress", basics.isActionInProgress());
-        }
-    }
-    
-    public void phase7() {
-        if (firstLoop) {
-
-            if (blueTeam) {
-                basics.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 48.5, 480, 12.12);
-            } else {
-                basics.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 48.5, 480, 12.12);
-            }
-
-            firstLoop = false;
-        } else {
-
-            basics.update();
-            if (!basics.isActionInProgress()) {
-                endPhase();
-            }
-
-        }
-    }
-
     public void phase8() {
-        if (firstLoop) {
-            distToMove = 10 - distBack.getDistance(DistanceUnit.INCH);
-            basics.moveRobotEncoder(wheels, -0.4, distToMove, 480, 12.12);
-            firstLoop = false;
-        } else {
-            basics.update();
-            if (!basics.isActionInProgress()) {
-                endPhase();
-            }
-        }
-    }
-
-    public void phase9() {
-        if (firstLoop) {
-            if (blueTeam) {
-                carouselMotor.setPower(1);
-            } else {
-                carouselMotor.setPower(-1);
-            }
-            startTime = runtime.time(TimeUnit.SECONDS);
-            firstLoop = false;
-        } else {
-            endTime = runtime.time(TimeUnit.SECONDS);
-            if (endTime - startTime >= 5) {
-                carouselMotor.setPower(0);
-                endPhase();
-            }
-        }
-    }
-
-    public void phase10() {
-        if (firstLoop) {
-
-            if (blueTeam) {
-                basics.moveRobotEncoder(wheels, -0.5, 0.5, 0.5, -0.5, 30, 480, 12.12);
-            } else {
-                basics.moveRobotEncoder(wheels, 0.5, -0.5, -0.5, 0.5, 30, 480, 12.12);
-            }
-
-            firstLoop = false;
-        } else {
-            basics.update();
-            if (!basics.isActionInProgress()) {
-                endPhase();
-            }
-        }
-    }
-
-    public void phase11() {
         if (firstLoop) {
             distToMove = distBack.getDistance(DistanceUnit.INCH) - 5;
             basics.moveRobotEncoder(wheels, -0.4, distToMove, 480, 12.12);
@@ -489,7 +386,7 @@ public class CarosuelSideAutonomus extends OpMode{
         }
     }
 
-    public void phase12() {
+    public void phase9() {
         if (firstLoop) {
             //left (right) 15in
             if (blueTeam) {
@@ -512,20 +409,6 @@ public class CarosuelSideAutonomus extends OpMode{
     public void endPhase() {
         phase++;
         firstLoop = true;
-    }
-    
-    public void resetEncoders() {
-        front_right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        front_left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        back_right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        back_left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    }
-    
-    public void activateMotors() {
-        front_right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        front_left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        back_right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        back_left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
     
     @Override
