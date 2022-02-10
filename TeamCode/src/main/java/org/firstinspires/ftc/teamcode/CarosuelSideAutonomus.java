@@ -220,6 +220,7 @@ public class CarosuelSideAutonomus extends OpMode{
         } else if (phase == 9) {
             //Spin Carousel (strafe to storage unit)
             //phase9();
+            phase12();
         } else if (phase == 10) {
             //Strafe straight to storage unit
             //phase10();
@@ -476,9 +477,30 @@ public class CarosuelSideAutonomus extends OpMode{
 
     public void phase11() {
         if (firstLoop) {
-            distToMove = distBack.getDistance(DistanceUnit.INCH);
+            distToMove = distBack.getDistance(DistanceUnit.INCH) - 5;
             basics.moveRobotEncoder(wheels, -0.4, distToMove, 480, 12.12);
+            firstLoop = false;
         } else {
+            basics.update();
+            if (basics.isActionInProgress()) {
+                return;
+            }
+            endPhase();
+        }
+    }
+
+    public void phase12() {
+        if (firstLoop) {
+            //left (right) 15in
+            if (blueTeam) {
+                basics.moveRobotEncoder(wheels, 0.4, -0.4, -0.4, 0.4, 20, 480, 12.12);
+            } else {
+                basics.moveRobotEncoder(wheels, -0.4, 0.4, 0.4, -0.4, 20, 480, 12.12);
+            }
+
+            firstLoop = false;
+        } else {
+            basics.update();
             if (basics.isActionInProgress()) {
                 return;
             }
