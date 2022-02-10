@@ -73,6 +73,12 @@ public class CarosuelSideAutonomus extends OpMode{
     }
     protected Level level;
 
+
+    //setTeam method
+    public void setTeam() {
+        blueTeam = true;
+    }
+
     //init function
     @Override
     public void init() {
@@ -150,6 +156,8 @@ public class CarosuelSideAutonomus extends OpMode{
         wheels = basics.createWheelGroup(front_right, front_left, back_right, back_left);
         wheels.frEncoderReverse = true;
         wheels.flEncoderReverse = true;
+
+        setTeam();
     }
     
     //start function
