@@ -140,7 +140,7 @@ public class CarosuelSideAutonomus extends OpMode{
                 "ShippingElement"
         };
 
-        tfodFreightFrenzy.setModelFromAsset("ShippingElement.tflite", labels);
+        tfodFreightFrenzy.setModelFromAsset("ElementV2.tflite", labels);
         
         tfodFreightFrenzy.initialize(
             vuforiaFreightFrenzy, //Vuforia
