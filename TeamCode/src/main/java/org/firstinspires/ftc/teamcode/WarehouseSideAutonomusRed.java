@@ -18,9 +18,7 @@ import org.firstinspires.ftc.teamcode.lib.OpModeBasics;
 public class WarehouseSideAutonomusRed extends WarehouseSideAutonomus {
 
     @Override
-    public void start() {
-        liftMotor.setTargetPosition(0);
-        liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    public void setTeam() {
         blueTeam = false;
     }
 } 

@@ -39,11 +39,16 @@ public class WarehouseSideAutonomus extends OpMode{
     protected double startTime;
     protected double endTime;
     protected ElapsedTime runtime = new ElapsedTime();
+
+    protected OpModeBasics.WheelGroup wheels;
     
-    
+    public void setTeam() {
+        blueTeam = true;
+    }
+
     @Override
     public void init() {
-        blueTeam = true;
+        setTeam();
         
         front_right = hardwareMap.dcMotor.get("front_right");
         front_left = hardwareMap.dcMotor.get("front_left");
@@ -58,6 +63,7 @@ public class WarehouseSideAutonomus extends OpMode{
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         
         basics = new OpModeBasics(front_right, front_left, back_right, back_left);
+        wheels = basics.createWheelGroup(front_right, front_left, back_right, back_left);
         
         phase = 1;
     }
@@ -94,32 +100,32 @@ public class WarehouseSideAutonomus extends OpMode{
     public void phase2() {
         if (firstLoop) {
             if (blueTeam) {
-                basics.powerMotors(0.6, -0.6, -0.6, 0.6);
+                basics.moveRobotEncoder(wheels, 0.6, -0.6, -0.6, 0.6, 28, 480, 12.12);
             } else {
-                basics.powerMotors(-0.6, 0.6, 0.6, -0.6);
+                basics.moveRobotEncoder(wheels, -0.6, 0.6, 0.6, -0.6, 28, 480, 12.12);
             }
-            startTime = runtime.time(TimeUnit.SECONDS);
             firstLoop = false;
         } else {
-            endTime = runtime.time(TimeUnit.SECONDS);
-            if (endTime - startTime >= 1.5) {
-                basics.powerMotors(0);
-                endPhase();
+            basics.update();
+            if (basics.isActionInProgress()) {
+                return;
             }
+
+            endPhase();
         }
     }
     
     public void phase3 () {
         if (firstLoop) {
-            basics.powerMotors(0.6);
-            startTime = runtime.time(TimeUnit.SECONDS);
+            basics.moveRobotEncoder(wheels, 0.6, 20, 480, 12.12);
             firstLoop = false;
         } else {
-            endTime = runtime.time(TimeUnit.SECONDS);
-            if (endTime - startTime >= 0.7) {
-                basics.powerMotors(0);
-                endPhase();
+            basics.update();
+            if (basics.isActionInProgress()) {
+                return;
             }
+
+            endPhase();
         }
     }
     

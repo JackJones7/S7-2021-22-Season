@@ -316,9 +316,9 @@ public class CarosuelSideAutonomus extends OpMode{
         if (firstLoop) {
             
             if (blueTeam) {
-                basics.moveRobotEncoder(wheels, -speed, speed - 0.05, speed, -speed, 48, 480, 12.12);
+                basics.moveRobotEncoder(wheels, -speed, speed - 0.05, speed, -speed, 46, 480, 12.12);
             } else {
-                basics.moveRobotEncoder(wheels, speed, -speed, -speed, speed - 0.05, 48, 480, 12.12);
+                basics.moveRobotEncoder(wheels, speed, -speed, -speed, speed - 0.05, 46, 480, 12.12);
             }
 
             firstLoop = false;
