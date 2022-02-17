@@ -121,9 +121,9 @@ public class OMBTest extends OpMode {
         } else if (gamepad1.dpad_up) {
             basics.moveRobotEncoder(wheels, 0.4, 12, 480, 12.12);
         } else if (gamepad1.dpad_left) {
-            basics.moveRobotEncoder(wheels, 0.4, -0.4, -0.4, 0.4, 12, 480, 12.12);
+            basics.turnRobotEncoder(wheels, 90, 0.4, 480, 12.12, 11.5, 7.5);
         } else if (gamepad1.dpad_right) {
-            basics.moveRobotEncoder(wheels, -0.4, 0.4, 0.4, -0.4, 12, 480, 12.12);
+            basics.turnRobotEncoder(wheels, -90, 0.4, 480, 12.12, 11.5, 7.5);
         }
 
         telemetry.addData("ticks to victory", Math.abs(basics.inchToTick(6, 480, 12)));

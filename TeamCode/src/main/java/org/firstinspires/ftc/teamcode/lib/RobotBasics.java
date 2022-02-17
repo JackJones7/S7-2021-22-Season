@@ -217,6 +217,13 @@ public class RobotBasics {
         currentAction.execute();
         actionInProgress = true;
     }
+
+    public void turnRobotEncoder(WheelGroup wheels, double degrees, double power, int tpr, double circumference,
+                                 double horizontalWheelDist, double verticalWheelDist) {
+        currentAction = new TurnRobotEncoder(wheels, degrees, power, tpr, circumference, horizontalWheelDist, verticalWheelDist);
+        currentAction.execute();
+        actionInProgress = true;
+    }
     
     
 //Inches -> ticks converter
