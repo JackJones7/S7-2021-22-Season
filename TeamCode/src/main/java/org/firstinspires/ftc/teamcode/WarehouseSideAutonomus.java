@@ -10,7 +10,17 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Blinker;
 import com.qualcomm.robotcore.hardware.Gyroscope;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaCurrentGame;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TfodCurrentGame;
+
 import org.firstinspires.ftc.teamcode.lib.RobotBasics;
+
+import java.util.List;
 
 @Autonomous
 
@@ -30,6 +40,13 @@ public class WarehouseSideAutonomus extends OpMode{
     protected Gyroscope imu;
     protected Servo left_intake;
     protected Servo right_intake;
+
+    protected VuforiaCurrentGame vuforiaFreightFrenzy;
+    protected TfodCurrentGame tfodFreightFrenzy;
+    protected List<Recognition> recognitions;
+    protected Recognition element;
+
+    protected double distToWall;
     
     protected boolean blueTeam;
     protected RobotBasics basics;
@@ -40,6 +57,15 @@ public class WarehouseSideAutonomus extends OpMode{
     protected ElapsedTime runtime = new ElapsedTime();
 
     protected RobotBasics.WheelGroup wheels;
+
+    protected enum Level {
+        TOP,
+        MIDDLE,
+        BOTTOM,
+        WHAT
+    }
+
+    protected Level level;
     
     public void setTeam() {
         blueTeam = true;
@@ -60,6 +86,46 @@ public class WarehouseSideAutonomus extends OpMode{
         liftMotor = hardwareMap.dcMotor.get("LiftMotor");
         
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+
+        vuforiaFreightFrenzy = new VuforiaCurrentGame();
+        tfodFreightFrenzy = new TfodCurrentGame();
+
+        vuforiaFreightFrenzy.initialize(
+                "", //Vuforia Liscense Key
+                hardwareMap.get(WebcamName.class, "Webcam 1"), //Webcam Name
+                "", //Webcam Calibration Filename
+                false, //Use Extended Tracking
+                true, //Enable Camera Monitoring
+                VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES, //Camera Monitor Feedback
+                0, //dx
+                0, //dy
+                0, //dz
+                AxesOrder.XYZ, //Axes Order
+                90, //First Angle
+                90, //Second Angle
+                0, //Third Angle
+                true //Use competition feild target locations
+        );
+
+
+        final String[] labels = {
+                "ShippingElement"
+        };
+
+        tfodFreightFrenzy.setModelFromAsset("ElementV2.tflite", labels);
+
+        tfodFreightFrenzy.initialize(
+                vuforiaFreightFrenzy, //Vuforia
+                (float) 0.7, //Minimum confidence
+                true, //Use object tracker
+                true //Enable camera monitoring
+        );
+
+
+        tfodFreightFrenzy.activate();
+        tfodFreightFrenzy.setZoom(1, 16 / 9);
+
         
         basics = new RobotBasics(front_right, front_left, back_right, back_left);
         wheels = basics.createWheelGroup(front_right, front_left, back_right, back_left);
@@ -71,42 +137,74 @@ public class WarehouseSideAutonomus extends OpMode{
     public void start() {
         liftMotor.setTargetPosition(0);
         liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        vuforiaFreightFrenzy.activate();
     }
     
     @Override
     public void loop() {
         if (phase == 1) {
+            //Detect Duck level
             phase1();
         } else if (phase == 2) {
+            //Raise arm to correct level
             phase2();
         } else if (phase == 3) {
+            //Move forward to hub
             phase3();
         }
     }
-    
+
     public void phase1() {
         if (firstLoop) {
-            liftMotor.setTargetPosition(409);
-            liftMotor.setPower(0.5);
+            /*basics.powerMotors(-0.3);*/
+            recognitions = tfodFreightFrenzy.getRecognitions();
+
+            if (recognitions.size() == 0) {
+                level = Level.WHAT;
+                distToWall = 36.0;
+                telemetry.addData("what", "there's no element");
+            } else {
+                for (Recognition rec : recognitions) {
+                    if (rec.getLabel() == "ShippingElement") {
+                        element = rec;
+                        double elementLeft = element.getLeft();
+
+                        if (elementLeft >= 450) {
+                            level = Level.TOP;
+                            distToWall = 39.0;
+                        } else if (elementLeft <= 350 && elementLeft >= 100) {
+                            level = Level.MIDDLE;
+                            distToWall = 36.0;
+                        } else {
+                            level = Level.BOTTOM;
+                            distToWall = 36.0;
+                        }
+
+
+                        tfodFreightFrenzy.deactivate();
+                    }
+                }
+            }
             firstLoop = false;
         } else {
-            if (!liftMotor.isBusy()) {
-                endPhase();
-            }
+            endPhase();
         }
     }
     
     public void phase2() {
         if (firstLoop) {
-            if (blueTeam) {
-                basics.moveRobotEncoder(wheels, 0.6, -0.6, -0.6, 0.6, 28, 480, 12.12);
+            if (level == Level.TOP) {
+                liftMotor.setTargetPosition(643);
+            } else if (level == Level.MIDDLE) {
+                liftMotor.setTargetPosition(409);
             } else {
-                basics.moveRobotEncoder(wheels, -0.6, 0.6, 0.6, -0.6, 28, 480, 12.12);
+                liftMotor.setTargetPosition(190);
             }
+            liftMotor.setPower(0.5);
             firstLoop = false;
         } else {
-            basics.update();
-            if (basics.isActionInProgress()) {
+
+            if (liftMotor.isBusy()) {
                 return;
             }
 
