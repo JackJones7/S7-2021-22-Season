@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Blinker;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 
-import org.firstinspires.ftc.teamcode.lib.OpModeBasics;
-import org.firstinspires.ftc.teamcode.lib.OpModeBasics.WheelGroup;
+import org.firstinspires.ftc.teamcode.lib.RobotBasics;
+import org.firstinspires.ftc.teamcode.lib.RobotBasics.WheelGroup;
 
 @Autonomous
 
@@ -31,7 +31,7 @@ public class OMBTest extends OpMode {
     private Servo right_intake;
     private BNO055IMU imu;
     
-    private OpModeBasics basics;
+    private RobotBasics basics;
     private boolean setupComplete = false;
     private WheelGroup wheels;
 
@@ -46,7 +46,7 @@ public class OMBTest extends OpMode {
         front_right.setDirection(DcMotorSimple.Direction.REVERSE);
         back_right.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        basics = new OpModeBasics(front_right, front_left, back_right, back_left);
+        basics = new RobotBasics(front_right, front_left, back_right, back_left);
         wheels = basics.createWheelGroup(front_right, front_left, back_right, back_left);
 
         wheels.setTargetPositions(0);

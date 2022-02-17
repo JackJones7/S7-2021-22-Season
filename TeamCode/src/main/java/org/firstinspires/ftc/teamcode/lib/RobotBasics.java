@@ -13,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 
 
-public class OpModeBasics {
+public class RobotBasics {
     
 //functionality variables >>
     //define variables used for alignment correction
@@ -56,7 +56,7 @@ public class OpModeBasics {
 
     
     //Constructor
-    public OpModeBasics(DcMotor fr, DcMotor fl, DcMotor br, DcMotor bl, BNO055IMU imu) {
+    public RobotBasics(DcMotor fr, DcMotor fl, DcMotor br, DcMotor bl, BNO055IMU imu) {
         //This will take four motors
         this.fr = fr;
         this.fl = fl;
@@ -74,7 +74,7 @@ public class OpModeBasics {
     }
     
     //Other Constructor
-    public OpModeBasics(DcMotor fr, DcMotor fl, DcMotor br, DcMotor bl) {
+    public RobotBasics(DcMotor fr, DcMotor fl, DcMotor br, DcMotor bl) {
         //This will take four motors
         this.fr = fr;
         this.fl = fl;

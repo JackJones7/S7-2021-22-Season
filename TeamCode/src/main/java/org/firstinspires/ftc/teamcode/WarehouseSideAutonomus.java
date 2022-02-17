@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import java.util.concurrent.TimeUnit;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -11,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Blinker;
 import com.qualcomm.robotcore.hardware.Gyroscope;
 
-import org.firstinspires.ftc.teamcode.lib.OpModeBasics;
+import org.firstinspires.ftc.teamcode.lib.RobotBasics;
 
 @Autonomous
 
@@ -33,14 +32,14 @@ public class WarehouseSideAutonomus extends OpMode{
     protected Servo right_intake;
     
     protected boolean blueTeam;
-    protected OpModeBasics basics;
+    protected RobotBasics basics;
     protected int phase;
     protected boolean firstLoop = true;
     protected double startTime;
     protected double endTime;
     protected ElapsedTime runtime = new ElapsedTime();
 
-    protected OpModeBasics.WheelGroup wheels;
+    protected RobotBasics.WheelGroup wheels;
     
     public void setTeam() {
         blueTeam = true;
@@ -62,7 +61,7 @@ public class WarehouseSideAutonomus extends OpMode{
         
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         
-        basics = new OpModeBasics(front_right, front_left, back_right, back_left);
+        basics = new RobotBasics(front_right, front_left, back_right, back_left);
         wheels = basics.createWheelGroup(front_right, front_left, back_right, back_left);
         
         phase = 1;

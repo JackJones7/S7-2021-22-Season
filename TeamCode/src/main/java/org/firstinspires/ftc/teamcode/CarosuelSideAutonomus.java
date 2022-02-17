@@ -22,8 +22,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TfodCurrentGame;
 
-import org.firstinspires.ftc.teamcode.lib.OpModeBasics;
-import org.firstinspires.ftc.teamcode.lib.OpModeBasics.WheelGroup;
+import org.firstinspires.ftc.teamcode.lib.RobotBasics;
+import org.firstinspires.ftc.teamcode.lib.RobotBasics.WheelGroup;
 
 @Autonomous
 
@@ -49,7 +49,7 @@ public class CarosuelSideAutonomus extends OpMode{
     protected List<Recognition> recognitions;
     protected Recognition element;
     
-    protected OpModeBasics basics;
+    protected RobotBasics basics;
     protected WheelGroup wheels;
 
     protected boolean blueTeam = true;
@@ -153,7 +153,7 @@ public class CarosuelSideAutonomus extends OpMode{
         tfodFreightFrenzy.activate();
         tfodFreightFrenzy.setZoom(1, 16 / 9);
         
-        basics = new OpModeBasics(front_right, front_left, back_right, back_left);
+        basics = new RobotBasics(front_right, front_left, back_right, back_left);
         wheels = basics.createWheelGroup(front_right, front_left, back_right, back_left);
         wheels.frEncoderReverse = true;
         wheels.flEncoderReverse = true;

@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Blinker;
 import com.qualcomm.robotcore.hardware.Gyroscope;
 
-import org.firstinspires.ftc.teamcode.lib.OpModeBasics;
+import org.firstinspires.ftc.teamcode.lib.RobotBasics;
 
 @TeleOp
 
@@ -31,7 +31,7 @@ public class S7TeleOp extends OpMode {
     private Servo left_intake;
     private Servo right_intake;
     
-    private OpModeBasics basics;
+    private RobotBasics basics;
     private double bucketPos = 0;
     private boolean limitUnlocked = false;
     
@@ -75,7 +75,7 @@ public class S7TeleOp extends OpMode {
         distL = hardwareMap.get(DistanceSensor.class, "DistL");
         distBack = hardwareMap.get(DistanceSensor.class, "DistBack");
         
-        basics = new OpModeBasics(front_right, front_left, back_right, back_left);
+        basics = new RobotBasics(front_right, front_left, back_right, back_left);
     }
     
     @Override
