@@ -217,6 +217,13 @@ public class RobotBasics {
         currentAction.execute();
         actionInProgress = true;
     }
+
+    public void turnRobotEncoder(WheelGroup wheels, double degrees, double power, int tpr, double circumference,
+                                 double horizontalWheelDist, double verticalWheelDist) {
+        currentAction = new TurnRobotEncoder(wheels, degrees, power, tpr, circumference, horizontalWheelDist, verticalWheelDist);
+        currentAction.execute();
+        actionInProgress = true;
+    }
     
     
 //Inches -> ticks converter
@@ -552,16 +559,52 @@ public class RobotBasics {
     public class TurnRobotEncoder extends MoveRobotEncoder {
 
         private double degrees;
+        private double verticalWheelDist;
+        private double horizontalWheelDist;
 
-        public TurnRobotEncoder(double degrees, double power, int tpr, double circumference) {
+        public TurnRobotEncoder(WheelGroup wheels, double degrees, double power, int tpr, double circumference,
+                                double horizontalWheelDist, double verticalWheelDist) {
+
             this.degrees = degrees;
-            super.frPower = power;
-            super.flPower = power;
-            super.brPower = power;
-            super.blPower = power;
+            this.verticalWheelDist = verticalWheelDist; // 7.5
+            this.horizontalWheelDist = horizontalWheelDist; // 11.5
+
+            if (degrees > 0) {
+                super.frPower = -power;
+                super.flPower = power;
+                super.brPower = -power;
+                super.blPower = power;
+            } else {
+                super.frPower = power;
+                super.flPower = -power;
+                super.brPower = power;
+                super.blPower = -power;
+            }
+
             super.tpr = tpr;
             super.circumference = circumference;
+            super.wheels = wheels;
+            super.startMode = wheels.fr.getMode();
         }
+
+
+        @Override
+        public void execute() {
+            super.wheels.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            double diameter = Math.sqrt((horizontalWheelDist * horizontalWheelDist) + (verticalWheelDist * verticalWheelDist));
+            double robotCircumference = diameter * 3.14;
+            double inches = robotCircumference * (degrees/360);
+            int ticks = inchToTick(inches, super.tpr, super.circumference);
+
+            super.frTgt = Math.abs(ticks);
+            super.flTgt = Math.abs(ticks);
+            super.brTgt = Math.abs(ticks);
+            super.blTgt = Math.abs(ticks);
+
+            super.wheels.setPower(super.frPower, super.flPower, super.brPower, super.blPower);
+        }
+
 
     }
     
