@@ -562,10 +562,18 @@ public class RobotBasics {
             this.verticalWheelDist = verticalWheelDist; // 7.5
             this.horizontalWheelDist = horizontalWheelDist; // 11.5
 
-            super.frPower = power;
-            super.flPower = power;
-            super.brPower = power;
-            super.blPower = power;
+            if (degrees > 0) {
+                super.frPower = -power;
+                super.flPower = power;
+                super.brPower = -power;
+                super.blPower = power;
+            } else {
+                super.frPower = power;
+                super.flPower = -power;
+                super.brPower = power;
+                super.blPower = -power;
+            }
+
             super.tpr = tpr;
             super.circumference = circumference;
             super.wheels = wheels;
@@ -586,6 +594,8 @@ public class RobotBasics {
             super.flTgt = Math.abs(ticks);
             super.brTgt = Math.abs(ticks);
             super.blTgt = Math.abs(ticks);
+
+            super.wheels.setPower(super.frPower, super.flPower, super.brPower, super.blPower);
         }
 
 
