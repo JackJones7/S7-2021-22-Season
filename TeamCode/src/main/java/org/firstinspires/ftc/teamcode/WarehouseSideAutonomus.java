@@ -79,9 +79,19 @@ public class WarehouseSideAutonomus extends OpMode{
         front_left = hardwareMap.dcMotor.get("front_left");
         back_right = hardwareMap.dcMotor.get("back_right");
         back_left = hardwareMap.dcMotor.get("back_left");
+
+        front_right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        front_left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        back_right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        back_left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         
         front_right.setDirection(DcMotorSimple.Direction.REVERSE);
         back_right.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        right_intake = hardwareMap.get(Servo.class, "right_intake");
+        left_intake = hardwareMap.get(Servo.class, "left_intake");
+
+        right_intake.setDirection(Servo.Direction.REVERSE);
         
         liftMotor = hardwareMap.dcMotor.get("LiftMotor");
         
@@ -138,6 +148,9 @@ public class WarehouseSideAutonomus extends OpMode{
         liftMotor.setTargetPosition(0);
         liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         vuforiaFreightFrenzy.activate();
+
+        right_intake.setPosition(0.03);
+        left_intake.setPosition(0.03);
     }
     
     @Override
@@ -151,6 +164,13 @@ public class WarehouseSideAutonomus extends OpMode{
         } else if (phase == 3) {
             //Move forward to hub
             phase3();
+        } else if (phase == 4) {
+            //Strafe about halfway to hub
+            phase4();
+        } else if (phase == 5) {
+            //Turn 90 Degrees towards hub
+            //phase5();
+            //vertical dist = 11.25, horizontal dist = 13.25
         }
     }
 
@@ -214,7 +234,26 @@ public class WarehouseSideAutonomus extends OpMode{
     
     public void phase3 () {
         if (firstLoop) {
-            basics.moveRobotEncoder(wheels, 0.6, 20, 480, 12.12);
+            basics.moveRobotEncoder(wheels, 0.4, 24, 480, 12.12);
+            firstLoop = false;
+        } else {
+            basics.update();
+            if (basics.isActionInProgress()) {
+                return;
+            }
+
+            endPhase();
+        }
+    }
+
+    public void phase4() {
+        if (firstLoop) {
+            if (blueTeam) {
+                basics.moveRobotEncoder(wheels, 0.4, -0.4, -0.4, 0.4, 14, 480, 12.12);
+            } else {
+                basics.moveRobotEncoder(wheels, -0.4, 0.4, 0.4, -0.4, 14, 480, 12.12);
+            }
+
             firstLoop = false;
         } else {
             basics.update();
