@@ -1,6 +1,7 @@
 //Motor order: fr, fl, br, bl
 package org.firstinspires.ftc.teamcode.lib;
 
+import org.checkerframework.checker.units.qual.degrees;
 import org.firstinspires.ftc.robotcore.external.navigation.Axis;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -487,6 +488,9 @@ public class RobotBasics {
             this.startMode = wheels.fr.getMode();
         }
 
+        public MoveRobotEncoder() {
+        }
+
 
         //execute function
         @Override
@@ -540,6 +544,23 @@ public class RobotBasics {
 
             //}
 
+        }
+
+    }
+
+
+    public class TurnRobotEncoder extends MoveRobotEncoder {
+
+        private double degrees;
+
+        public TurnRobotEncoder(double degrees, double power, int tpr, double circumference) {
+            this.degrees = degrees;
+            super.frPower = power;
+            super.flPower = power;
+            super.brPower = power;
+            super.blPower = power;
+            super.tpr = tpr;
+            super.circumference = circumference;
         }
 
     }

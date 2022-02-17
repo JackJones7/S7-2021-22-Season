@@ -155,8 +155,8 @@ public class CarosuelSideAutonomus extends OpMode{
         
         basics = new RobotBasics(front_right, front_left, back_right, back_left);
         wheels = basics.createWheelGroup(front_right, front_left, back_right, back_left);
-        wheels.frEncoderReverse = true;
-        wheels.flEncoderReverse = true;
+        //wheels.frEncoderReverse = true;
+        //wheels.flEncoderReverse = true;
         speed = 0.4;
 
         setTeam();
@@ -316,9 +316,9 @@ public class CarosuelSideAutonomus extends OpMode{
         if (firstLoop) {
             
             if (blueTeam) {
-                basics.moveRobotEncoder(wheels, -speed, speed - 0.05, speed, -speed, 46, 480, 12.12);
+                basics.moveRobotEncoder(wheels, -speed, speed, speed + 0.05, -speed, 46, 480, 12.12);
             } else {
-                basics.moveRobotEncoder(wheels, speed, -speed, -speed, speed - 0.05, 46, 480, 12.12);
+                basics.moveRobotEncoder(wheels, speed, -speed, -speed, speed + 0.05, 46, 480, 12.12);
             }
 
             firstLoop = false;
@@ -362,7 +362,7 @@ public class CarosuelSideAutonomus extends OpMode{
 
     public void phase8() {
         if (firstLoop) {
-            distToMove = distBack.getDistance(DistanceUnit.INCH) - 5;
+            distToMove = distBack.getDistance(DistanceUnit.INCH) - 7;
             basics.moveRobotEncoder(wheels, -speed, distToMove, 480, 12.12);
             firstLoop = false;
         } else {
