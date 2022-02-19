@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.Gyroscope;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaCurrentGame;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
@@ -97,6 +98,7 @@ public class WarehouseSideAutonomus extends OpMode{
         
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        distBack = hardwareMap.get(DistanceSensor.class, "DistBack");
 
         vuforiaFreightFrenzy = new VuforiaCurrentGame();
         tfodFreightFrenzy = new TfodCurrentGame();
@@ -169,8 +171,10 @@ public class WarehouseSideAutonomus extends OpMode{
             phase4();
         } else if (phase == 5) {
             //Turn 90 Degrees towards hub
-            //phase5();
-            //vertical dist = 11.25, horizontal dist = 13.25
+            phase5();
+        } else if (phase == 6) {
+            //Move forward to hub
+            phase6();
         }
     }
 
@@ -191,13 +195,13 @@ public class WarehouseSideAutonomus extends OpMode{
 
                         if (elementLeft >= 450) {
                             level = Level.TOP;
-                            distToWall = 39.0;
+                            distToWall = 25.0;
                         } else if (elementLeft <= 350 && elementLeft >= 100) {
                             level = Level.MIDDLE;
-                            distToWall = 36.0;
+                            distToWall = 22.0;
                         } else {
                             level = Level.BOTTOM;
-                            distToWall = 36.0;
+                            distToWall = 22.0;
                         }
 
 
@@ -218,7 +222,7 @@ public class WarehouseSideAutonomus extends OpMode{
             } else if (level == Level.MIDDLE) {
                 liftMotor.setTargetPosition(409);
             } else {
-                liftMotor.setTargetPosition(190);
+                liftMotor.setTargetPosition(200);
             }
             liftMotor.setPower(0.5);
             firstLoop = false;
@@ -261,6 +265,34 @@ public class WarehouseSideAutonomus extends OpMode{
                 return;
             }
 
+            endPhase();
+        }
+    }
+
+    public void phase5() {
+        if (firstLoop) {
+            basics.turnRobotEncoder(wheels, -95, 0.4, 480, 12.12, 13.25, 11.25);
+            firstLoop = false;
+        } else {
+            basics.update();
+            if (basics.isActionInProgress()) {
+                return;
+            }
+            endPhase();
+        }
+    }
+
+    public void phase6() {
+        if (firstLoop) {
+            double distToMove = distToWall - distBack.getDistance(DistanceUnit.INCH);
+            basics.moveRobotEncoder(wheels, 0.4, distToMove, 480, 12.12);
+
+            firstLoop = false;
+        } else {
+            basics.update();
+            if (basics.isActionInProgress()) {
+                return;
+            }
             endPhase();
         }
     }
