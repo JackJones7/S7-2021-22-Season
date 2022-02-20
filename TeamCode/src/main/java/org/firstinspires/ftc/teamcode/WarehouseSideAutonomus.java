@@ -22,6 +22,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TfodCurrentGame;
 import org.firstinspires.ftc.teamcode.lib.RobotBasics;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Autonomous
 
@@ -175,8 +176,24 @@ public class WarehouseSideAutonomus extends OpMode{
         } else if (phase == 6) {
             //Move forward to hub
             phase6();
+        } else if (phase == 7) {
+            //Drop Freight
+            phase7();
+        } else if (phase == 8) {
+            //Move backwards to wall
+            phase8();
+        } else if (phase == 9) {
+            //Raise arm to top level, to keep out of way of bars
+            phase9();
+        } else if (phase == 10) {
+            //strafe 56 inches to warehouse
+            phase10();
+        } else if (phase == 11) {
+            //move forward out of the way of other robot
+            phase11();
         }
     }
+
 
     public void phase1() {
         if (firstLoop) {
@@ -185,7 +202,7 @@ public class WarehouseSideAutonomus extends OpMode{
 
             if (recognitions.size() == 0) {
                 level = Level.WHAT;
-                distToWall = 36.0;
+                distToWall = 22.0;
                 telemetry.addData("what", "there's no element");
             } else {
                 for (Recognition rec : recognitions) {
@@ -297,7 +314,79 @@ public class WarehouseSideAutonomus extends OpMode{
         }
     }
     
-    
+    public void phase7() {
+        if (firstLoop) {
+            right_intake.setPosition(0.1);
+            left_intake.setPosition(0.1);
+            startTime = runtime.time(TimeUnit.SECONDS);
+
+            firstLoop = false;
+        } else {
+            endTime = runtime.time(TimeUnit.SECONDS);
+            if (endTime - startTime >= 0.5) {
+                return;
+            }
+            endPhase();
+        }
+    }
+
+    public void phase8() {
+        if (firstLoop) {
+            firstLoop = false;
+            double distToMove = 0.8 - distBack.getDistance(DistanceUnit.INCH);
+            basics.moveRobotEncoder(wheels, -0.35, distToMove, 480, 12.12);
+        } else {
+            basics.update();
+            if (basics.isActionInProgress()) {
+                return;
+            }
+            endPhase();
+        }
+    }
+
+    public void phase9() {
+        if (firstLoop) {
+            liftMotor.setTargetPosition(643);
+            firstLoop = false;
+        } else {
+            if (liftMotor.isBusy()) {
+                return;
+            }
+            endPhase();
+        }
+    }
+
+    public void phase10() {
+        if (firstLoop) {
+            if (blueTeam) {
+                basics.moveRobotEncoder(wheels, 0.4, -0.4, -0.4, 0.4 + 0.07, 56, 480, 12.12);
+            } else {
+                basics.moveRobotEncoder(wheels, -0.4, 0.4, 0.4 + 0.07, -0.4, 56, 480, 12.12);
+            }
+            firstLoop = false;
+        } else {
+            basics.update();
+            if (basics.isActionInProgress()) {
+                return;
+            }
+            endPhase();
+        }
+    }
+
+    public void phase11() {
+        if (firstLoop) {
+            firstLoop = false;
+            double distToMove = 24 - distBack.getDistance(DistanceUnit.INCH);
+            basics.moveRobotEncoder(wheels, 0.4, distToMove, 480, 12.12);
+        } else {
+            basics.update();
+            if (basics.isActionInProgress()) {
+                return;
+            }
+            endPhase();
+        }
+    }
+
     
     public void endPhase() {
         phase++;
