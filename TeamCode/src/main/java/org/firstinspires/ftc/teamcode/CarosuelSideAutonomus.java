@@ -270,7 +270,7 @@ public class CarosuelSideAutonomus extends OpMode{
             } else if (level == Level.MIDDLE) {
                 liftMotor.setTargetPosition(409);
             } else {
-                liftMotor.setTargetPosition(190);
+                liftMotor.setTargetPosition(200);
             }
             liftMotor.setPower(0.5);
             firstLoop = false;
@@ -378,9 +378,9 @@ public class CarosuelSideAutonomus extends OpMode{
         if (firstLoop) {
             //left (right) 15in
             if (blueTeam) {
-                basics.moveRobotEncoder(wheels, speed, -speed, -speed, speed, 20, 480, 12.12);
+                basics.moveRobotEncoder(wheels, speed, -speed, -speed, speed, 17, 480, 12.12);
             } else {
-                basics.moveRobotEncoder(wheels, -speed, speed, speed, -speed, 20, 480, 12.12);
+                basics.moveRobotEncoder(wheels, -speed, speed, speed, -speed, 17, 480, 12.12);
             }
 
             firstLoop = false;
