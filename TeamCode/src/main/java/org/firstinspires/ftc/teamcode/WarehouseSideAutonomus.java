@@ -288,7 +288,11 @@ public class WarehouseSideAutonomus extends OpMode{
 
     public void phase5() {
         if (firstLoop) {
-            basics.turnRobotEncoder(wheels, -95, 0.4, 480, 12.12, 13.25, 11.25);
+            if (blueTeam) {
+                basics.turnRobotEncoder(wheels, -95, 0.4, 480, 12.12, 13.25, 11.25);
+            } else {
+                basics.turnRobotEncoder(wheels, 95, 0.4, 480, 12.12, 13.25, 11.25);
+            }
             firstLoop = false;
         } else {
             basics.update();
