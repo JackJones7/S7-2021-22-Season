@@ -265,14 +265,15 @@ public class CarouselSideAutonomous extends OpMode{
 
     public void phase2() {
         if (firstLoop) {
-            if (level == Level.TOP) {
+            /*if (level == Level.TOP) {
                 liftMotor.setTargetPosition(643);
             } else if (level == Level.MIDDLE) {
-                liftMotor.setTargetPosition(409);
+                liftMotor.setTargetPosition(395);
             } else {
                 liftMotor.setTargetPosition(200);
-            }
+            }*/
             liftMotor.setPower(0.5);
+            liftMotor.setTargetPosition(643);
             firstLoop = false;
         } else {
             if (!liftMotor.isBusy()) {
@@ -283,7 +284,7 @@ public class CarouselSideAutonomous extends OpMode{
 
     public void phase3() {
         if (firstLoop) {
-            distToMove = 10 - distBack.getDistance(DistanceUnit.INCH);
+            distToMove = 11 - distBack.getDistance(DistanceUnit.INCH);
             basics.moveRobotEncoder(wheels, -speed, distToMove, 480, 12.12);
             firstLoop = false;
         } else {
@@ -316,9 +317,9 @@ public class CarouselSideAutonomous extends OpMode{
         if (firstLoop) {
             
             if (blueTeam) {
-                basics.moveRobotEncoder(wheels, -speed, speed, speed + 0.05, -speed, 46, 480, 12.12);
+                basics.moveRobotEncoder(wheels, -speed, speed, speed + 0.015, -speed, 43, 480, 12.12);
             } else {
-                basics.moveRobotEncoder(wheels, speed, -speed, -speed, speed + 0.05, 46, 480, 12.12);
+                basics.moveRobotEncoder(wheels, speed, -speed, -speed, speed + 0.015, 43, 480, 12.12);
             }
 
             firstLoop = false;
@@ -336,13 +337,21 @@ public class CarouselSideAutonomous extends OpMode{
         if (firstLoop) {
             distToMove = distToWall - distBack.getDistance(DistanceUnit.INCH);
             basics.moveRobotEncoder(wheels, speed, distToMove, 480, 12.12);
+
+            if (level == Level.TOP) {
+                liftMotor.setTargetPosition(643);
+            } else if (level == Level.MIDDLE) {
+                liftMotor.setTargetPosition(395);
+            } else {
+                liftMotor.setTargetPosition(200);
+            }
+
             firstLoop = false;
         } else {
             basics.update();
             if (!basics.isActionInProgress()) {
                 endPhase();
             }
-            telemetry.addData("action in progress", basics.isActionInProgress());
         }
     }
     
