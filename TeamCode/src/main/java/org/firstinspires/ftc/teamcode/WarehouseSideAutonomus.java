@@ -337,11 +337,13 @@ public class WarehouseSideAutonomus extends OpMode{
     public void phase8() {
         if (firstLoop) {
             firstLoop = false;
-            double distToMove = 0.8 - distBack.getDistance(DistanceUnit.INCH);
+            double distToMove = 0.85 - distBack.getDistance(DistanceUnit.INCH);
             basics.moveRobotEncoder(wheels, -0.35, distToMove, 480, 12.12);
+            startTime = runtime.time(TimeUnit.SECONDS);
         } else {
             basics.update();
-            if (basics.isActionInProgress()) {
+            endTime = runtime.time(TimeUnit.SECONDS);
+            if (basics.isActionInProgress() || endTime - startTime <= 5) {
                 return;
             }
             endPhase();
@@ -363,14 +365,16 @@ public class WarehouseSideAutonomus extends OpMode{
     public void phase10() {
         if (firstLoop) {
             if (blueTeam) {
-                basics.moveRobotEncoder(wheels, 0.4, -0.4, -0.4, 0.4 + 0.07, 56, 480, 12.12);
+                basics.moveRobotEncoder(wheels, 0.4, -0.4, -0.4, 0.4, 56, 480, 12.12);
             } else {
-                basics.moveRobotEncoder(wheels, -0.4, 0.4, 0.4 + 0.07, -0.4, 56, 480, 12.12);
+                basics.moveRobotEncoder(wheels, -0.4, 0.4, 0.4, -0.4, 56, 480, 12.12);
             }
+            startTime = runtime.time(TimeUnit.SECONDS);
             firstLoop = false;
         } else {
             basics.update();
-            if (basics.isActionInProgress()) {
+            endTime = runtime.time(TimeUnit.SECONDS);
+            if (basics.isActionInProgress() || endTime - startTime <= 5) {
                 return;
             }
             endPhase();
@@ -390,7 +394,6 @@ public class WarehouseSideAutonomus extends OpMode{
             endPhase();
         }
     }
-
     
     public void endPhase() {
         phase++;
