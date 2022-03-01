@@ -357,8 +357,8 @@ public class CarouselSideAutonomous extends OpMode{
     
     public void phase7() {
         if (firstLoop) {
-            left_intake.setPosition(0.1);
-            right_intake.setPosition(0.1);
+            left_intake.setPosition(0.5);
+            right_intake.setPosition(0.5);
             startTime = runtime.time(TimeUnit.SECONDS);
             firstLoop = false;
         } else {
