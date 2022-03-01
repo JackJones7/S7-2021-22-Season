@@ -238,13 +238,13 @@ public class CarouselSideAutonomous extends OpMode{
                         
                        if (elementLeft >= 450) {
                             level = Level.TOP;
-                            distToWall = 39.0;
+                            distToWall = 36.0;
                         } else if (elementLeft <= 350 && elementLeft >= 100) {
                             level = Level.MIDDLE;
-                            distToWall = 36.0;
+                            distToWall = 33.0;
                         } else {
                             level = Level.BOTTOM;
-                            distToWall = 36.0;
+                            distToWall = 33.0;
                         }
                         
                         
@@ -317,9 +317,9 @@ public class CarouselSideAutonomous extends OpMode{
         if (firstLoop) {
             
             if (blueTeam) {
-                basics.moveRobotEncoder(wheels, -speed, speed, speed + 0.015, -speed, 43, 480, 12.12);
+                basics.moveRobotEncoder(wheels, -speed, speed, speed + 0.05, -speed, 42, 480, 12.12);
             } else {
-                basics.moveRobotEncoder(wheels, speed, -speed, -speed, speed + 0.015, 43, 480, 12.12);
+                basics.moveRobotEncoder(wheels, speed, -speed, -speed, speed + 0.05, 42, 480, 12.12);
             }
 
             firstLoop = false;
@@ -387,9 +387,9 @@ public class CarouselSideAutonomous extends OpMode{
         if (firstLoop) {
             //left (right) 15in
             if (blueTeam) {
-                basics.moveRobotEncoder(wheels, speed, -speed, -speed, speed, 17, 480, 12.12);
+                basics.moveRobotEncoder(wheels, speed, -speed, -speed, speed, 14, 480, 12.12);
             } else {
-                basics.moveRobotEncoder(wheels, -speed, speed, speed, -speed, 17, 480, 12.12);
+                basics.moveRobotEncoder(wheels, -speed, speed, speed, -speed, 14, 480, 12.12);
             }
 
             firstLoop = false;
