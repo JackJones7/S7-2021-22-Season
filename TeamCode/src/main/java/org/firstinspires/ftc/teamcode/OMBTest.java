@@ -13,6 +13,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import org.firstinspires.ftc.teamcode.lib.RobotBasics;
 import org.firstinspires.ftc.teamcode.lib.RobotBasics.WheelGroup;
 
+@Disabled
 @Autonomous
 
 public class OMBTest extends OpMode {
