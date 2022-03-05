@@ -121,7 +121,7 @@ public class S7TeleOp extends OpMode {
         //}
         //
         //liftMotor.setTargetPosition(liftTgt);
-        liftMotor.setPower(gamepad2.left_stick_y * 0.4);
+        liftMotor.setPower(gamepad2.left_stick_y * 0.6);
         
         bucketPos += gamepad2.right_stick_x / 10;
         
