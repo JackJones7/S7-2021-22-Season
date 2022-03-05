@@ -2,9 +2,13 @@ package org.firstinspires.ftc.teamcode;
 
 import java.util.List;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaCurrentGame;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +44,7 @@ public class CarouselSideAutonomous extends OpMode{
     protected DcMotor back_right;
     protected DcMotor front_left;
     protected DcMotor front_right;
-    protected Gyroscope imu;
+    protected BNO055IMU imu;
     protected Servo left_intake;
     protected Servo right_intake;
     
@@ -119,7 +123,7 @@ public class CarouselSideAutonomous extends OpMode{
         tfodFreightFrenzy = new TfodCurrentGame();
         
         vuforiaFreightFrenzy.initialize(
-            "", //Vuforia Liscense Key
+            "", //Vuforia License Key
             hardwareMap.get(WebcamName.class, "Webcam 1"), //Webcam Name
             "", //Webcam Calibration Filename
             false, //Use Extended Tracking
@@ -132,7 +136,7 @@ public class CarouselSideAutonomous extends OpMode{
             90, //First Angle
             90, //Second Angle
             0, //Third Angle
-            true //Use competition feild target locations
+            true //Use competition field target locations
         );
 
 
@@ -152,6 +156,20 @@ public class CarouselSideAutonomous extends OpMode{
         
         tfodFreightFrenzy.activate();
         tfodFreightFrenzy.setZoom(1, 16 / 9);
+
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.mode = BNO055IMU.SensorMode.IMU;
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.loggingEnabled = false;
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
+        telemetry.addData("Imu Status", "Calibrating...");
+        telemetry.update();
+
         
         basics = new RobotBasics(front_right, front_left, back_right, back_left);
         wheels = basics.createWheelGroup(front_right, front_left, back_right, back_left);
@@ -160,6 +178,15 @@ public class CarouselSideAutonomous extends OpMode{
         speed = 0.4;
 
         setTeam();
+    }
+
+    //init loop
+    @Override
+    public void init_loop() {
+        if (!imu.isGyroCalibrated() && !imu.isAccelerometerCalibrated()) {
+                return;
+            }
+        telemetry.addData("Imu Status", imu.getCalibrationStatus().toString());
     }
     
     //start function
@@ -204,15 +231,18 @@ public class CarouselSideAutonomous extends OpMode{
             //strafe to shipping hub
             phase5();
         } else if (phase == 6) {
+            //Turn towards shipping hub
+            phaseImu();
+        } else if (phase == 7) {
             //move up to hub
             phase6();
-        } else if (phase == 7) {
+        } else if (phase == 8) {
             //drop freight
             phase7();
-        } else if (phase == 8) {
+        } else if (phase == 9) {
             //back up to wall
             phase8();
-        } else if (phase == 9) {
+        } else if (phase == 10) {
             //strafe to storage unit
             phase9();
         }
@@ -398,6 +428,15 @@ public class CarouselSideAutonomous extends OpMode{
             if (basics.isActionInProgress()) {
                 return;
             }
+            endPhase();
+        }
+    }
+
+    public void phaseImu() {
+        if (firstLoop) {
+            Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            firstLoop = false;
+        } else {
             endPhase();
         }
     }
